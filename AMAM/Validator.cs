@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using System.Globalization;
 
-namespace AMAM
+namespace Amam
 {
     class Validator
     {
@@ -20,8 +16,8 @@ namespace AMAM
         /// </summary>
         /// <param name="value">Übergibt den String, der auf XML-Validität geprüft werden soll</param>
         /// <returns>Gibt True zurück, wenn der String XML-valide ist</returns>
-        public bool IsXMLValid(string value)
-        {
+        public static bool IsXMLValid(string value)
+        { 
             if(value.Contains("&") || value.Contains("<") || value.Contains(">") || value.Contains("'") || value.Contains("»"))
             {
                 return false;
@@ -41,26 +37,11 @@ namespace AMAM
         {
             if(string.IsNullOrEmpty(MailAdress)) return false;
 
-            try
-            {
-                MailAdress = Regex.Replace(MailAdress, "(@)(.+)$", this.DomainMapper, RegexOptions.None, TimeSpan.FromMilliseconds(200));
-            }
-            catch (Exception)
-            {
-                return false;
-            }
+			MailAdress = Regex.Replace(MailAdress, "(@)(.+)$", this.DomainMapper, RegexOptions.None, TimeSpan.FromMilliseconds(200));
 
             if(boolMailInvalid) return false;
-
-            try
-            {
-                return Regex.IsMatch(MailAdress, @"^(?("")(""[^""]+?""@)|(([0-9a-z]((\.(?!\.))|[-!#\$%&'\*\+/=\?\^`\{\}\|~\w])*)(?<=[0-9a-z])@))(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-z][-\w]*[0-9a-z]*\.)+[a-z0-9]{2,17}))$", RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250));
-            }
-            catch(Exception)
-            {
-                return false;
-            }
-
+            
+			return Regex.IsMatch(MailAdress, @"^(?("")(""[^""]+?""@)|(([0-9a-z]((\.(?!\.))|[-!#\$%&'\*\+/=\?\^`\{\}\|~\w])*)(?<=[0-9a-z])@))(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-z][-\w]*[0-9a-z]*\.)+[a-z0-9]{2,17}))$", RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250));
         }
         
         private string DomainMapper(Match match)

@@ -1,25 +1,32 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Xml;
 using System.Data;
+using System.Security;
+using System.Security.Cryptography;
+using System.IO;
 
-namespace AMAM
+namespace Amam
 {
     /// <summary>
     /// Klasse, die einen Nutzer darstellt
     /// </summary>
-    class User
+    class UserList : IDisposable
     {
         //Private Variablen für die Wertübergabe innerhalb der Klasse
-        private string PathToUserlist;
-        private string _Username;
-        private string _PasswordHash;
-        private Int32 _Salt;
-        private System.Security.Cryptography.SaltedHashProvider HashProvider = new System.Security.Cryptography.SaltedHashProvider();
+        #region Klassenweite Variablen
+
+            private string _Username;
+            private string _PasswordHash;
+            private string _pathToUserList;
+            private DataSet ds = new DataSet();
+
+        #endregion
+
+			public void Dispose()
+			{
+				ds.Dispose();
+			}
 
         /// <summary>
         /// Gibt den Benutzernamen zurück
@@ -28,7 +35,14 @@ namespace AMAM
         {
             get
             {
-                return _Username;
+                if(_Username.Length > 0)
+                {
+                    return _Username;
+                }
+                else
+                {
+                    throw new ArgumentNullException(Username, "Sie müssen zuerst über die SelectUser-Methode einen Benutzer selektieren.");
+                }
             }
         }
 
@@ -39,28 +53,81 @@ namespace AMAM
         {
             get
             {
-                return _PasswordHash;
-            }
-        }
-
-        /// <summary>
-        /// Gibt den Salt zurück
-        /// </summary>
-        public Int32 Salt
-        {
-            get
-            {
-                return _Salt;
+                if(_PasswordHash.Length > 0)
+                {
+                    return _PasswordHash;
+                }
+                else
+                {
+                    throw new ArgumentNullException(PasswordHash, "Sie müssen zuerst über die SelectUser-Methode einen Benutzer selektieren.");
+                }
             }
         }
 
         /// <summary>
         /// Erstellt ein neues Objekt vom Typ 'User'
         /// </summary>
-        /// <param name="XmlPath">Gibt den Pfad der XML-Datei, die die Benutzerliste enthält an die Klasse weiter</param>
-        public User(string XmlPath)
+        /// <param name="pathToUserList">Gibt den Pfad der XML-Datei, die die Benutzerliste enthält an die Klasse weiter</param>
+        public UserList(string pathToUserList)
         {
-            PathToUserlist = XmlPath;
+            _pathToUserList = pathToUserList;
+
+            if(File.Exists(pathToUserList))
+            {
+                XmlReader xmlFile = XmlReader.Create(pathToUserList, new XmlReaderSettings());
+                try
+                {
+                    ds.ReadXml(xmlFile);
+                }
+                catch (Exception ex)
+                {
+                    throw new InvalidOperationException("Die Benutzerliste konnte nicht eingelesen werden.", ex);
+                }
+                xmlFile.Close();
+            }
+            else
+            {
+                throw new FileNotFoundException();
+            }
+            
+        }
+
+        /// <summary>
+        /// Speichert den aktuellen Zustand der Benutzerliste
+        /// </summary>
+        public void SaveUserlist()
+        {
+            try
+            {
+                ds.WriteXml(_pathToUserList);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException("Die Benutzerliste konnte nicht gespeichert werden.", ex);
+            }
+        }
+
+        /// <summary>
+        /// Selektiert einen Benutzer der Benutzerliste, sodass er bearbeitet werden kann
+        /// </summary>
+        /// <param name="Username">Übergibt den Benutzer, der selektiert werden soll</param>
+        public void SelectUser(string Username)
+        {
+            DataRow[] foundRows = ds.Tables["user"].Select("username = '" + Username + "'");
+            if(foundRows.Length == 0)
+            {
+                throw new ArgumentOutOfRangeException("Der Benutzer " + Username + " existiert nicht.");
+            }
+            if(foundRows.Length == 1)
+            {
+				DataRow row = foundRows[0];
+				_Username = row["username"].ToString();
+				_PasswordHash = row["password"].ToString();
+            }
+			if(foundRows.Length > 1)
+			{
+				throw new ArgumentOutOfRangeException(Username, "Der angegebene Benutzername ist mehrfach vorhanden.");
+			}
         }
 
         /// <summary>
@@ -72,86 +139,152 @@ namespace AMAM
         {
             if(Username.Length != 0 & Password.Length != 0)
             {
-                //TODO Funktion zum Hinzufügen eines neuen Benutzers || Muss noch getestet werden
-                Validator validate = new Validator();
-                if(!validate.IsXMLValid(Username))
+                if(Validator.IsXMLValid(Username))
                 {
-                    MessageBox.Show("Sie haben im Benutzernamen ein ungültiges Zeichen verwendet!\nDer Benutzername darf folgende Zeichen nicht enthalten:\n\n& < > ' »", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-                else
-                {
-                    XmlReader xmlFile = XmlReader.Create(PathToUserlist, new XmlReaderSettings());
-                    DataSet ds = new DataSet();
-                    ds.ReadXml(xmlFile);
-                    xmlFile.Close();
                     if(ds.Tables.Count == 0)
                     {
                         ds.Tables.Add("user");
                         ds.Tables["user"].Columns.Add("username");
-                        ds.Tables["user"].Columns.Add("salt");
                         ds.Tables["user"].Columns.Add("password");
                     }
+
                     DataRow[] foundRows =  ds.Tables["user"].Select("username = '" + Username + "'"); 
+
                     if(foundRows.Length != 0)
                     {
-                        MessageBox.Show("Der Benutzername existiert schon!\nBitte wählen Sie einen anderen Benutzernamen.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
+                        throw new ArgumentException("Der Benutzername ist schon vorhanden.");
                     }
                     else
                     {
                         DataRow newRow = ds.Tables["user"].NewRow();
                         newRow["username"] = Username;
-                        HashProvider.CreateSaltedHash(Password);
-                        newRow["salt"] = Convert.ToString(HashProvider.Salt);
-                        newRow["password"] = HashProvider.SaltedHash;
+                        _Username = Username;
+						_PasswordHash = Encryption.CreateHash(Password);
+                        newRow["password"] = _PasswordHash;
                         ds.Tables["user"].Rows.Add(newRow);
-                        ds.WriteXml(PathToUserlist);
                     }
                 }
+                else
+                {
+                    throw new ArgumentException("Der Benutzername enthält ein ungültiges Zeichen.");
+                }
+            }
 
+			if(Username.Length == 0 & Password.Length != 0)
+			{
+                    throw new UserNameIsNullOrEmptyException("Es muss ein Benutzername angegeben werden.");
             }
             if(Username.Length != 0 & Password.Length == 0)
             {
-                MessageBox.Show("Sie müssen ein Passwort eingeben!", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-            if(Username.Length == 0 & Password.Length != 0)
-            {
-                MessageBox.Show("Sie müssen einen Benutzernamen eingeben!", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
+                throw new PasswordIsNullOrEmptyException("Es muss ein Passwort angegeben werden.");
             }
             if(Username.Length == 0 & Password.Length == 0)
             {
-                MessageBox.Show("Sie müssen einen Benutzernamen und ein Passwort eingeben!", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
+                throw new UserNameIsNullOrEmptyException("Es muss ein Benutzername angegeben werden.");
+                throw new PasswordIsNullOrEmptyException("Es muss ein Passwort angegeben werden.");
             }
         }
 
         /// <summary>
         /// Methode zum Ändern des Benutzernamens
         /// </summary>
-        /// <param name="Username">Übergibt den Benutzernamen</param>
-        /// <param name="Password">Übergibt das Passwort</param>
-        public void ChangeUserName(string Username, string Password)
+        /// <param name="NewUsername">Übergibt den neuen Benutzernamen</param>
+        public void ChangeUserName(string NewUsername)
         {
+			if(NewUsername.Length != 0)
+			{
+				if(_Username.Length > 0)
+				{
+					DataRow[] foundRows = ds.Tables["user"].Select("username = '" + _Username + "'");
+					if(foundRows.Length == 0)
+					{
+						throw new ArgumentOutOfRangeException("Der Benutzer " + _Username + " existiert nicht.");
+					}
+					if(foundRows.Length == 1)
+					{
+						DataRow row = foundRows[0];
+						row["username"] = NewUsername;
+					}
+					if(foundRows.Length > 1)
+					{
+						throw new ArgumentOutOfRangeException(NewUsername, "Der angegebene Benutzername ist mehrfach vorhanden.");
+					}
+				}
+				else
+				{
+					throw new ArgumentNullException(NewUsername, "Sie müssen erst die SelectUser-Methode aufrufen um einen Benutzer aus der Benutzerliste zu wählen.");
+				}
+			}
+			else
+			{
+				throw new ArgumentNullException(NewUsername, "Es muss ein Benutzername angegeben werden.");
+			}
         }
 
         /// <summary>
         /// Funktion zum Ändern des Passwortes
         /// </summary>
-        /// <param name="Username">Übergibt den Benutzernamen, für den das Passwort geändert werden soll</param>
-        /// <param name="OldPassword">Übergibt das alte Passwort</param>
         /// <param name="NewPassword">Übergibt das neue Passwort</param>
-        /// <returns>Gibt True zurück, wenn das Ändern des Passwortes erfolgreich war</returns>
-        public bool ChangePassword(string Username, string OldPassword, string NewPassword)
+        public void ChangePassword(string NewPassword)
         {
-            return false;
+			if(NewPassword.Length != 0)
+			{
+				if(_Username.Length > 0)
+				{
+					DataRow[] foundRows = ds.Tables["user"].Select("username = '" + _Username + "'");
+					if(foundRows.Length == 0)
+					{
+						throw new ArgumentOutOfRangeException("Der Benutzer " + _Username + " existiert nicht.");
+					}
+					if(foundRows.Length == 1)
+					{
+						string PasswordHash = Encryption.CreateHash(NewPassword);
+						DataRow row = foundRows[0];
+						row["password"] = PasswordHash;
+					}
+					if(foundRows.Length > 1)
+					{
+						throw new ArgumentOutOfRangeException(NewPassword,"Der angegebene Benutzername ist mehrfach vorhanden.");
+
+					}
+				}
+				else
+				{
+					throw new ArgumentNullException(NewPassword, "Sie müssen erst die SelectUser-Methode aufrufen um einen Benutzer aus der Benutzerliste zu wählen.");
+				}
+			}
+			else
+			{
+				throw new ArgumentNullException(NewPassword, "Es muss ein Passwort angegeben werden.");
+			}
         }
 
         /// <summary>
-        /// Methode zum Löschen eines Benutzers
+        /// Löscht den selektierten Benutzer
         /// </summary>
-        /// <param name="Username">Übergibt den Benutzernamen</param>
-        /// <param name="Password">Übergibt das Passwort</param>
-        public void DeleteUser(string Username, string Password)
+        public void DeleteUser()
         {
-
+			if(_Username.Length > 0)
+			{
+				DataRow[] foundRows = ds.Tables["user"].Select("username = '" + _Username + "'");
+				if(foundRows.Length == 0)
+				{
+					throw new ArgumentOutOfRangeException("Der Benutzer " + _Username + " existiert nicht.");
+				}
+				if(foundRows.Length == 1)
+				{
+					DataRow row = foundRows[0];
+					row.Delete();
+				}
+				if(foundRows.Length > 1)
+				{
+					throw new ArgumentOutOfRangeException(_Username, "Der angegebene Benutzer ist mehrfach vorhanden.");
+				}
+			}
+			else
+			{
+				throw new ArgumentNullException(_Username, "Sie müssen erst die SelectUser-Methode aufrufen um einen Benutzer aus der Benutzerliste zu wählen.");
+			}
         }
 
     }

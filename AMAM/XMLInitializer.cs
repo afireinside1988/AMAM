@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
 using System.Xml;
+using System.Xml.Linq;
 
-namespace AMAM
+namespace Amam
 {
     /// <summary>
     /// Klasse, zur Intialisierung der XML-Datenbank
@@ -19,7 +16,6 @@ namespace AMAM
         {
             ApplicationDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "AMAM\\");
         }
-
 
         /// <summary>
         /// Funktion, die Untersucht, ob die XML-Datei-Struktur im Anwendungspfad existiert und das Ergebnis als Wert vom Typ Boolean zurückgibt
@@ -51,18 +47,15 @@ namespace AMAM
         {
             foreach(string XMLFile in XMLFiles)
             {
-                XmlDocument xmlFile = new XmlDocument();
-                XmlDeclaration xmlDeclaration = xmlFile.CreateXmlDeclaration("1.0", "UTF-8", null);
-                XmlElement RootNode = xmlFile.CreateElement(XMLFile);
-
-                xmlFile.InsertBefore(xmlDeclaration, xmlFile.DocumentElement);
-                xmlFile.AppendChild(RootNode);
+                XDocument xmlFile = new XDocument(
+                    new XDeclaration("1.0", "utf-8", "yes"),
+                    new XElement(XMLFile)
+                );
 
                 if(!Directory.Exists(ApplicationDataPath))
                 {
                     Directory.CreateDirectory(ApplicationDataPath);
                 }
-
                 xmlFile.Save(ApplicationDataPath + XMLFile + ".xml");
             }
         }

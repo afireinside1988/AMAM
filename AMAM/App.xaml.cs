@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace AMAM
+namespace Amam
 {
     /// <summary>
     /// Interaktionslogik für "App.xaml"
