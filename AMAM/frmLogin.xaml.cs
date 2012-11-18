@@ -3,6 +3,7 @@ using System.IO;
 using System.Data;
 using System.Windows;
 using System.Xml;
+using System.Xml.Linq;
 using System.Windows.Data;
 using System.Windows.Media;
 using System.Security.Cryptography;
@@ -17,6 +18,7 @@ namespace Amam
 
         private string xmlPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "AMAM\\users.xml");
         XMLInitializer initxml = new XMLInitializer(); //Neuen XML-Initialisierer einbinden
+		DataSet ds = new DataSet();
 
         public MainWindow()
         {
@@ -24,7 +26,8 @@ namespace Amam
             
             InitializeComponent();
 
-            string[] xmlFiles = { "users", "dealers", "products", "prices" }; //String-Array mit den benötigten Dateien
+            string[] xmlFiles = {"users"}; //String-Array mit den benötigten Dateien
+            ds.DataSetName = "users";
 
             if(initxml.XMLStructureInitialized(xmlFiles))
             {
@@ -34,11 +37,11 @@ namespace Amam
             {
                 initxml.CreateXMLFileStructure(xmlFiles);
                 MessageBox.Show("Dies ist der erste Start von Ambulance Merseburg Apotheken Manager."+Environment.NewLine + "Sie müssen nun einen Benutzer erstellen.", "Willkommen", MessageBoxButton.OK, MessageBoxImage.Information);
-                FrmAddUser AddUser = new FrmAddUser();
+                FrmAddUser AddUser = new FrmAddUser(ds);
                 AddUser.ShowDialog();
-                InitUserTable();
+                ds.WriteXml(xmlPath);
+				InitUserTable();
             }
-
         }
 
         /// <summary>
@@ -46,16 +49,25 @@ namespace Amam
         /// </summary>
         private void InitUserTable()
         {
-            DataSet ds = new DataSet();
+            cboUsername.Items.Clear();
+			
             XmlReader xmlFile = XmlReader.Create(xmlPath, new XmlReaderSettings());
             try
             {
-                ds.ReadXml(xmlFile);
-                xmlFile.Close();
-                if(ds.Tables.Count > 0)
-                {
-                    cboUsername.ItemsSource = ds.Tables["user"].DefaultView;
-                }
+
+				if(ds.Tables.Count > 0)
+				{
+					cboUsername.ItemsSource = ds.Tables["user"].DefaultView;
+				}
+				else
+				{
+					ds.ReadXml(xmlFile);
+					xmlFile.Close();
+					if(ds.Tables.Count > 0)
+					{
+						cboUsername.ItemsSource = ds.Tables["user"].DefaultView;
+					}
+				}
             }
             catch(XmlException ex)
             {
@@ -74,9 +86,9 @@ namespace Amam
                 MessageBoxResult MessageResult = MessageBox.Show("Die Benutzerdatenbank enthält keinen Benutzer." + Environment.NewLine + "Sie müssen nun einen Benutzer anlegen um fortfahren zu können.", "Fehler", MessageBoxButton.OKCancel, MessageBoxImage.Error);
                 if(MessageResult == MessageBoxResult.OK)
                 {
-                    FrmAddUser AddUser = new FrmAddUser();
+                    FrmAddUser AddUser = new FrmAddUser(ds);
                     AddUser.ShowDialog();
-                    InitUserTable();
+                    ds.WriteXml(xmlPath);
                 }
                 else
                 {
@@ -97,6 +109,9 @@ namespace Amam
 
             if(Encryption.CreateHash(tbPassword.Password) == cboUsername.SelectedValue.ToString())
             {
+				frmUserlist Userlist = new frmUserlist();
+				Userlist.Show();
+				this.Close();
 				//MessageBox.Show("Das Passwort ist richtig.", "Hinweis", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             else

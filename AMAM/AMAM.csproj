@@ -29,6 +29,7 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <ExpressionBlendVersion>5.2.30810.0</ExpressionBlendVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -60,8 +61,11 @@
     <StartupObject>Amam.App</StartupObject>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Expression.Effects" />
+    <Reference Include="Microsoft.Expression.Interactions" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Windows.Interactivity" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -83,12 +87,29 @@
     <Compile Include="frmAddUser.xaml.cs">
       <DependentUpon>frmAddUser.xaml</DependentUpon>
     </Compile>
+    <Compile Include="frmChangeUser.xaml.cs">
+      <DependentUpon>frmChangeUser.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="frmDeleteUser.xaml.cs">
+      <DependentUpon>frmDeleteUser.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="frmUserlist.xaml.cs">
+      <DependentUpon>frmUserlist.xaml</DependentUpon>
+    </Compile>
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Hash.cs" />
-    <Compile Include="User.cs" />
+    <Compile Include="Users.cs" />
     <Compile Include="Validator.cs" />
     <Compile Include="XMLInitializer.cs" />
     <Page Include="frmAddUser.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="frmChangeUser.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="frmDeleteUser.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -104,6 +125,10 @@
       <DependentUpon>frmLogin.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="frmUserlist.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
