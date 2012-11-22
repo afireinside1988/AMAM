@@ -1,34 +1,31 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using System.Data;
 using System.Security.Cryptography;
+using System.Windows;
+using System.Windows.Media;
 
 namespace Amam
 {
 	/// <summary>
 	/// Interaktionslogik für frmChangeUser.xaml
 	/// </summary>
-	public partial class frmChangeUser : Window
+	public partial class FrmChangeUser : Window
 	{
 		UserList usr;
 
-		public frmChangeUser(DataSet parent, string username)
+		public FrmChangeUser(DataSet parent, string user)
 		{
 			InitializeComponent();
 			usr = new UserList(parent);
-			usr.SelectUser(username);
-			tbNewUsername.Text = username;
+			try
+			{
+				usr.SelectUser(user);
+				tbNewUsername.Text = user;
+			}
+			catch(ArgumentOutOfRangeException ex)
+			{
+				MessageBox.Show(ex.Message, "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
 		}
 
 		private void OldPasswordChanged(object sender, RoutedEventArgs e)
@@ -112,6 +109,5 @@ namespace Amam
 
 				this.Close();
 		}
-
 	}
 }

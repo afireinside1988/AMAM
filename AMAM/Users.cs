@@ -34,7 +34,7 @@ namespace Amam
         {
             get
             {
-                if(_Username.Length > 0)
+                if(!(_Username == null))
                 {
                     return _Username;
                 }
@@ -52,7 +52,7 @@ namespace Amam
         {
             get
             {
-                if(_PasswordHash.Length > 0)
+                if(!(_PasswordHash == null))
                 {
                     return _PasswordHash;
                 }
@@ -73,14 +73,6 @@ namespace Amam
         }
 
         /// <summary>
-        /// Speichert den aktuellen Zustand der Benutzerliste
-        /// </summary>
-        public void SaveToUserlist(DataSet ds)
-        {
-            ds = _ds;
-        }
-
-        /// <summary>
         /// Selektiert einen Benutzer der Benutzerliste, sodass er bearbeitet werden kann
         /// </summary>
         /// <param name="Username">Übergibt den Benutzer, der selektiert werden soll</param>
@@ -89,7 +81,7 @@ namespace Amam
             DataRow[] foundRows = _ds.Tables["user"].Select("username = '" + Username + "'");
             if(foundRows.Length == 0)
             {
-                throw new ArgumentOutOfRangeException("Der Benutzer " + Username + " existiert nicht.");
+				throw new ArgumentOutOfRangeException("Der Benutzer " + Username + " existiert nicht.");
             }
             if(foundRows.Length == 1)
             {
@@ -142,7 +134,6 @@ namespace Amam
                     throw new ArgumentException("Der Benutzername enthält ein ungültiges Zeichen.");
                 }
             }
-
 			if(Username.Length == 0 & Password.Length != 0)
 			{
                     throw new UserNameIsNullOrEmptyException("Es muss ein Benutzername angegeben werden.");

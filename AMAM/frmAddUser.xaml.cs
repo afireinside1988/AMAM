@@ -14,10 +14,10 @@ namespace Amam
     {
         DataSet ds;
 
-        public FrmAddUser(DataSet Parent)
+        public FrmAddUser(DataSet parent)
         {
             InitializeComponent();
-            ds = Parent;
+            ds = parent;
         }
 
         /// <summary>
@@ -39,7 +39,6 @@ namespace Amam
 					try
 					{
 						usr.CreateUser(tbUsername.Text, tbPassword.Password);
-						usr.SaveToUserlist(ds);
 						this.Close();
 					}
 					catch(UserNameIsNullOrEmptyException ex)

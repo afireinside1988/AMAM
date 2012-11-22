@@ -84,28 +84,52 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Exceptions.cs" />
+    <Compile Include="frmAddDealer.xaml.cs">
+      <DependentUpon>frmAddDealer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="frmAddUser.xaml.cs">
       <DependentUpon>frmAddUser.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="frmChangeDealer.xaml.cs">
+      <DependentUpon>frmChangeDealer.xaml</DependentUpon>
     </Compile>
     <Compile Include="frmChangeUser.xaml.cs">
       <DependentUpon>frmChangeUser.xaml</DependentUpon>
     </Compile>
+    <Compile Include="frmDealersList.xaml.cs">
+      <DependentUpon>frmDealersList.xaml</DependentUpon>
+    </Compile>
     <Compile Include="frmDeleteUser.xaml.cs">
       <DependentUpon>frmDeleteUser.xaml</DependentUpon>
     </Compile>
-    <Compile Include="frmUserlist.xaml.cs">
-      <DependentUpon>frmUserlist.xaml</DependentUpon>
+    <Compile Include="frmMain.xaml.cs">
+      <DependentUpon>frmMain.xaml</DependentUpon>
     </Compile>
-    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="frmUserList.xaml.cs">
+      <DependentUpon>frmUserList.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Hash.cs" />
+    <Compile Include="sql.cs" />
     <Compile Include="Users.cs" />
     <Compile Include="Validator.cs" />
     <Compile Include="XMLInitializer.cs" />
+    <Page Include="frmAddDealer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="frmAddUser.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="frmChangeDealer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="frmChangeUser.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="frmDealersList.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -125,7 +149,11 @@
       <DependentUpon>frmLogin.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="frmUserlist.xaml">
+    <Page Include="frmMain.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="frmUserList.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

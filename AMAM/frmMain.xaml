@@ -1,0 +1,30 @@
+﻿<Window x:Name="MainWindow" x:Class="Amam.FrmMain"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Ambulance Merseburg Apotheken Manager" Height="351" Width="468">
+	<DockPanel HorizontalAlignment="Left" LastChildFill="True" Margin="0" VerticalAlignment="Top">
+		<Menu Width="{Binding ActualWidth, ElementName=MainWindow}" DockPanel.Dock="Top">
+			<MenuItem Header="Datei">
+				<MenuItem Header="Neue Bestellung"/>
+				<MenuItem Header="Bestellung laden" />
+				<Separator Height="1" />
+				<MenuItem Header="eMail-Einstellungen"/>
+				<Separator  Height="1"/>
+				<MenuItem Header="Beenden" Click="Close"/>
+			</MenuItem>
+			<MenuItem Header="Datenbank">
+				<MenuItem Header="Benutzer" Click="ShowUserManager"/>
+				<MenuItem Header="Vertriebe" Click="ShowDealerManager"/>
+				<MenuItem Header="Produkte"/>
+			</MenuItem>
+			<MenuItem Header="Hilfe">
+				<MenuItem Header="Hilfe anzeigen"/>
+				<Separator Height="1" />
+				<MenuItem Header="Über..."/>
+			</MenuItem>
+		</Menu>
+        <StackPanel Width="{Binding ActualWidth, ElementName=MainWindow}">
+            <TextBlock FontSize="36" TextWrapping="Wrap" >Was hier rein soll weiß ich noch nicht...</TextBlock>
+        </StackPanel>
+	</DockPanel>
+</Window>

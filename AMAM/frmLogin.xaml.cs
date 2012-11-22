@@ -1,12 +1,10 @@
 ﻿using System;
-using System.IO;
 using System.Data;
-using System.Windows;
-using System.Xml;
-using System.Xml.Linq;
-using System.Windows.Data;
-using System.Windows.Media;
+using System.IO;
 using System.Security.Cryptography;
+using System.Windows;
+using System.Windows.Media;
+using System.Xml;
 
 namespace Amam
 {
@@ -89,6 +87,7 @@ namespace Amam
                     FrmAddUser AddUser = new FrmAddUser(ds);
                     AddUser.ShowDialog();
                     ds.WriteXml(xmlPath);
+					cboUsername.ItemsSource = ds.Tables["user"].DefaultView;
                 }
                 else
                 {
@@ -109,8 +108,8 @@ namespace Amam
 
             if(Encryption.CreateHash(tbPassword.Password) == cboUsername.SelectedValue.ToString())
             {
-				frmUserlist Userlist = new frmUserlist();
-				Userlist.Show();
+				FrmMain MainForm = new FrmMain();
+				MainForm.Show();
 				this.Close();
 				//MessageBox.Show("Das Passwort ist richtig.", "Hinweis", MessageBoxButton.OK, MessageBoxImage.Information);
             }

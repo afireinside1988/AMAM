@@ -39,6 +39,14 @@ namespace Amam
         }
     }
 
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors"), Serializable]
+	public class SqlServerNotFoundException : Exception
+	{
+		public SqlServerNotFoundException(string message) : base(message)
+		{
+		}
+	}
+
     /// <summary>
     /// Die Klasse stellt einen Reporting-Dienst zur Verfügung, der Ausnahmen per Mail an den Administrator übermittelt
     /// </summary>
@@ -74,6 +82,7 @@ namespace Amam
                 MessageBox.Show("Es konnte keine Datei an die eMail angefügt werden. Die eMail wird ohne Anhang versendet.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
         /// <summary>
         ///  Methode zum Versenden eines Fehlerberichtes per eMail
         /// </summary>

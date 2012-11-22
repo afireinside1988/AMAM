@@ -1,21 +1,21 @@
-﻿using System.Windows;
-using System.IO;
-using System;
+﻿using System;
 using System.Data;
+using System.IO;
+using System.Windows;
 using System.Xml;
-using System.Collections.ObjectModel;
 
 namespace Amam
 {
+
 	/// <summary>
 	/// Interaktionslogik für frmUserlist.xaml
 	/// </summary>
-	public partial class frmUserlist : Window
+	public partial class FrmUserlist : Window
 	{
         private string xmlPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\AMAM\\users.xml");
 		DataSet ds = new DataSet();
 
-		public frmUserlist()
+		public FrmUserlist()
 		{
 			InitializeComponent();
             XMLInitializer initxml = new XMLInitializer();
@@ -27,7 +27,7 @@ namespace Amam
 				{
 					ds.ReadXml(xmlFile);
 					xmlFile.Close();
-					lvUsers.ItemsSource = ds.Tables["user"].DefaultView;
+					lvUsers.DataContext = ds.Tables["user"].DefaultView;
 				}
 				catch(XmlException ex)
 				{
@@ -49,6 +49,7 @@ namespace Amam
 		{
 			FrmAddUser frmAdd = new FrmAddUser(ds);
 			frmAdd.ShowDialog();
+			
             ds.WriteXml(xmlPath);
 		}
 
@@ -64,25 +65,41 @@ namespace Amam
 			this.Close();
 		}
 
-		private void SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
-		{
-			if(lvUsers.SelectedItem != null)
-			{
-				btnChange.IsEnabled = true;
-				btnRemove.IsEnabled = true;
-			}
-			else
-			{
-				btnChange.IsEnabled = false;
-				btnRemove.IsEnabled = false;
-			}
-		}
+        private void SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            if(lvUsers.SelectedItem != null)
+            {
+                switch(lvUsers.Items.Count)
+                {
+                    case 0:
+                        btnChange.IsEnabled = false;
+                        btnRemove.IsEnabled = false;
+                        break;
+                    case 1:
+                        btnChange.IsEnabled = true;
+                        btnRemove.IsEnabled = false;
+                        break;
+                    default:
+                        btnChange.IsEnabled = true;
+                        btnRemove.IsEnabled = true;
+                        break;
+                }
+            }
+            else
+            {
+                btnChange.IsEnabled = false;
+                btnRemove.IsEnabled = false;
+            }
+        }
 
 		private void ChangeUser(object sender, RoutedEventArgs e)
 		{
-			frmChangeUser frmChange = new frmChangeUser(ds, lvUsers.SelectedValue.ToString());
+			FrmChangeUser frmChange = new FrmChangeUser(ds, lvUsers.SelectedValue.ToString());
 			frmChange.ShowDialog();
+			lvUsers.SelectedIndex = 0;
 			ds.WriteXml(xmlPath);
 		}
+
 	}
+
 }
