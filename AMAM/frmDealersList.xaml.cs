@@ -114,7 +114,7 @@ namespace Amam
 					}
 					else
 					{
-						SqlCommand newTable = new SqlCommand("CREATE TABLE Dealers (Vertrieb nvarchar(255), eMail nvarchar(255), Kundennummer nvarchar(255))", sqlConn);
+						SqlCommand newTable = new SqlCommand("CREATE TABLE Dealers (ID int IDENTITY(0,1), Vertrieb nvarchar(255), eMail nvarchar(255), Kundennummer nvarchar(255))", sqlConn);
 						newTable.ExecuteNonQuery();
 
 						SqlDataAdapter dataAdapter = new SqlDataAdapter("SELECT * FROM Dealers;", sqlConn);
