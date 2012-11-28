@@ -1,9 +1,7 @@
 ﻿using System;
-using System.IO;
+using System.Data;
 using System.Windows;
 using System.Windows.Media;
-using System.Xml;
-using System.Data;
 
 namespace Amam
 {

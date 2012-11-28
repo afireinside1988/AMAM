@@ -1,20 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Data;
+using System.Data.SqlClient;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using System.Data.Sql;
-using System.Data.SqlClient;
-using System.Data;
-using System.Threading;
 
 namespace Amam
 {
@@ -108,21 +95,25 @@ namespace Amam
 					sqlConn.Open();
 					if(sqlhelper.TableExists(sqlConn, "Dealers"))
 					{
-						SqlDataAdapter dataAdapter = new SqlDataAdapter("SELECT * FROM Dealers;", sqlConn);
+						SqlDataAdapter dataAdapter = new SqlDataAdapter("SELECT * FROM Dealers", sqlConn);
 						SqlCommandBuilder cmdBuilder = new SqlCommandBuilder(dataAdapter);
 						dataAdapter.Fill(dt);
 					}
 					else
 					{
-						SqlCommand newTable = new SqlCommand("CREATE TABLE Dealers (ID int IDENTITY(0,1), Vertrieb nvarchar(255), eMail nvarchar(255), Kundennummer nvarchar(255))", sqlConn);
+						SqlCommand newTable = new SqlCommand("CREATE TABLE Dealers (VertriebID int IDENTITY(1,1 )CONSTRAINT pkVertriebID PRIMARY KEY, "+
+																"Vertrieb nvarchar(255) NOT NULL, "+ 
+																"eMail nvarchar(255) NOT NULL, " +
+																"Kundennummer nvarchar(255) NOT NULL)", sqlConn);
 						newTable.ExecuteNonQuery();
 
 						SqlDataAdapter dataAdapter = new SqlDataAdapter("SELECT * FROM Dealers;", sqlConn);
 						SqlCommandBuilder cmdBuilder = new SqlCommandBuilder(dataAdapter);
 						dataAdapter.Fill(dt);
 					}
+					dt.PrimaryKey = new DataColumn[] { dt.Columns["pkVertriebID"] };
 					dgDealers.DataContext = dt;
-                    dgDealers.SelectedValuePath = "Vertrieb";
+                    dgDealers.SelectedValuePath = "VertriebID";
 				}
 				catch(SqlException ex)
 				{
@@ -169,8 +160,8 @@ namespace Amam
                     {
                         sqlConn.Open();
 
-                        SqlCommand RemoveDealerCommand = new SqlCommand("DELETE FROM Dealers WHERE Vertrieb = @paramDealer", sqlConn);
-                        RemoveDealerCommand.Parameters.Add(new SqlParameter("@paramDealer", dgDealers.SelectedValue.ToString()));
+                        SqlCommand RemoveDealerCommand = new SqlCommand("DELETE FROM Dealers WHERE VertriebID = @paramPK", sqlConn);
+                        RemoveDealerCommand.Parameters.Add(new SqlParameter("@paramPK", dgDealers.SelectedValue));
 
                         RemoveDealerCommand.ExecuteNonQuery();
                         RefreshDataBase();

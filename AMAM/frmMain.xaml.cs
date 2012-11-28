@@ -32,13 +32,19 @@ namespace Amam
 		private void ShowUserManager(object sender, RoutedEventArgs e)
 		{
 			FrmUserlist UserManager = new FrmUserlist();
-			UserManager.Show();
+			UserManager.ShowDialog();
 		}
 
 		private void ShowDealerManager(object sender, RoutedEventArgs e)
 		{
 			FrmDealersList DealerManager = new FrmDealersList();
-			DealerManager.Show();
+			DealerManager.ShowDialog();
+		}
+
+		private void ShowProductManager(object sender, RoutedEventArgs e)
+		{
+			FrmProductList ProductManager = new FrmProductList();
+			ProductManager.ShowDialog();
 		}
 	}
 }

@@ -7,7 +7,7 @@
         SizeToContent="WidthAndHeight"
         ResizeMode="NoResize">
     <Canvas Margin="0" Width="400" Height="256">
-        <TextBlock Canvas.Left="10" TextWrapping="Wrap" Text="Bitte geben Sie das aktuelle Passwort an um den Benutzer zu bearbeiten:" Canvas.Top="10" FontSize="16" Width="380"/>
+        <TextBlock Canvas.Left="10" TextWrapping="Wrap" Text="Bitte geben Sie das aktuelle Passwort an, um den Benutzer zu bearbeiten:" Canvas.Top="10" FontSize="16" Width="380"/>
         <Label Content="Aktuelles Passwort:" Canvas.Left="10" Canvas.Top="58"/>
         <GroupBox x:Name="gbChangeUser" Header="Neue Benutzerdaten" Canvas.Left="10" Canvas.Top="89" Height="118" Width="380" IsEnabled="False">
             <Canvas Margin="0">

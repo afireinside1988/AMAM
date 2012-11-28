@@ -56,6 +56,7 @@ namespace Amam
 				if(ds.Tables.Count > 0)
 				{
 					cboUsername.ItemsSource = ds.Tables["user"].DefaultView;
+					cboUsername.SelectedIndex = 0;
 				}
 				else
 				{
@@ -64,6 +65,7 @@ namespace Amam
 					if(ds.Tables.Count > 0)
 					{
 						cboUsername.ItemsSource = ds.Tables["user"].DefaultView;
+						cboUsername.SelectedIndex = 0;
 					}
 				}
             }
@@ -88,6 +90,7 @@ namespace Amam
                     AddUser.ShowDialog();
                     ds.WriteXml(xmlPath);
 					cboUsername.ItemsSource = ds.Tables["user"].DefaultView;
+					cboUsername.SelectedIndex = 0;
                 }
                 else
                 {

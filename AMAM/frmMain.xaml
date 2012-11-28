@@ -15,7 +15,7 @@
 			<MenuItem Header="Datenbank">
 				<MenuItem Header="Benutzer" Click="ShowUserManager"/>
 				<MenuItem Header="Vertriebe" Click="ShowDealerManager"/>
-				<MenuItem Header="Produkte"/>
+				<MenuItem Header="Produkte" Click="ShowProductManager"/>
 			</MenuItem>
 			<MenuItem Header="Hilfe">
 				<MenuItem Header="Hilfe anzeigen"/>

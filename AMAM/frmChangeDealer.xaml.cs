@@ -1,19 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using System.Data.Sql;
+﻿using System.Data;
 using System.Data.SqlClient;
-using System.Data;
+using System.Windows;
+using System.Windows.Media;
 
 namespace Amam
 {
@@ -22,13 +10,13 @@ namespace Amam
     /// </summary>
     public partial class FrmChangeDealer : Window
     {
-        string _vertrieb;
+        string _ID;
 
-        public FrmChangeDealer(string vertrieb)
+        public FrmChangeDealer(string ID)
         {
             InitializeComponent();
 
-            _vertrieb = vertrieb;
+            _ID = ID;
 
             SqlConnectionStringBuilder ConnString = new SqlConnectionStringBuilder();
             ConnString.DataSource = "localhost";
@@ -40,8 +28,8 @@ namespace Amam
                 try
                 {
                     sqlConn.Open();
-                    SqlCommand ReadRow = new SqlCommand("SELECT Vertrieb, eMail, Kundennummer FROM Dealers WHERE Vertrieb = @paramVertrieb", sqlConn);
-                    ReadRow.Parameters.Add(new SqlParameter("@paramVertrieb", vertrieb));
+                    SqlCommand ReadRow = new SqlCommand("SELECT Vertrieb, eMail, Kundennummer FROM Dealers WHERE VertriebID = @paramPK", sqlConn);
+                    ReadRow.Parameters.Add(new SqlParameter("@paramPK", ID));
                     using(SqlDataReader dr = ReadRow.ExecuteReader())
                     {
                         while(dr.Read())
@@ -102,12 +90,12 @@ namespace Amam
                                                                     "Vertrieb = @paramVertrieb, " +
                                                                     "eMail = @paramMail, " +
                                                                     "Kundennummer = @paramCustomerID " +
-                                                                    "WHERE Vertrieb = @paramOldVertrieb", sqlConn);
+                                                                    "WHERE VertriebID = @paramPK", sqlConn);
                         
                         changeCommand.Parameters.Add(new SqlParameter("@paramVertrieb", tbDealer.Text));
                         changeCommand.Parameters.Add(new SqlParameter("@paramMail", tbMail.Text));
                         changeCommand.Parameters.Add(new SqlParameter("@paramCustomerID", tbCustomerID.Text));
-                        changeCommand.Parameters.Add(new SqlParameter("@paramOldVertrieb", _vertrieb));
+                        changeCommand.Parameters.Add(new SqlParameter("@paramPK", _ID));
 
                         changeCommand.ExecuteNonQuery();
                         this.Close();

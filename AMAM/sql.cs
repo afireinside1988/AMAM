@@ -19,5 +19,6 @@ namespace Amam
 			DataTable dt = connection.GetSchema("Tables", filter);
 			return dt.Rows.Count == 1;
 		}
+
 	}
 }

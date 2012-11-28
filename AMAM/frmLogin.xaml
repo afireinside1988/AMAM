@@ -14,7 +14,7 @@
         <PasswordBox x:Name="tbPassword" Canvas.Left="109" Canvas.Top="99" Width="250" Height="23" PasswordChanged="PasswordInputChanged" TabIndex="1"/>
         <Button x:Name="btnLogIn" Content="Einloggen" Canvas.Left="325" Canvas.Top="137" IsEnabled="False" Click="LogIn" IsDefault="True" TabIndex="2" Padding="5"/>
         <Button Content="Beenden" Canvas.Left="262" Canvas.Top="137" Click="Close" IsCancel="True" TabIndex="3" Padding="5"/>
-        <ComboBox x:Name="cboUsername" Canvas.Left="109" Canvas.Top="69" Width="250" IsReadOnly="True" DisplayMemberPath="username" SelectedValuePath="password" TabIndex="0"></ComboBox>
+        <ComboBox x:Name="cboUsername" Canvas.Left="109" Canvas.Top="69" Width="250" IsReadOnly="True" ItemsSource="{Binding}" DisplayMemberPath="username" SelectedValuePath="password" TabIndex="0"></ComboBox>
         <TextBlock Canvas.Left="10" TextWrapping="Wrap" Text="Ambulance Merseburg Apotheken Manager" Canvas.Top="10" FontSize="18"/>
     </Canvas>
 </Window>

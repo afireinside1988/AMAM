@@ -43,6 +43,35 @@ namespace Amam
             
 			return Regex.IsMatch(MailAdress, @"^(?("")(""[^""]+?""@)|(([0-9a-z]((\.(?!\.))|[-!#\$%&'\*\+/=\?\^`\{\}\|~\w])*)(?<=[0-9a-z])@))(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-z][-\w]*[0-9a-z]*\.)+[a-z0-9]{2,17}))$", RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250));
         }
+
+		public static string FormatPrice(string value)
+		{
+			value = value.Replace(".", ",");
+			if(value.EndsWith("€"))
+			{
+				value = value.TrimEnd(Convert.ToChar("€"));
+			}
+			if(!value.Contains(","))
+			{
+				if(Regex.IsMatch(value, "[0-9]"))
+				{
+					value += ",00";
+					return value;
+				}
+			}
+			if(Regex.IsMatch(value, "[0-9]+(,)[0-9]{0,2}"))
+			{
+				string[] cent;
+				cent = value.Split(Convert.ToChar(","));
+				if(cent[1].Length < 2)
+				{
+					cent[1] += "0";
+					value = cent[0] + "," + cent[1];
+				}
+				return value;
+			}
+			else throw new ArgumentInvalidException("Bitte geben Sie einen gültigen Preis ein.");
+		}
         
         private string DomainMapper(Match match)
         {
