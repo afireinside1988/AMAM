@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Data;
-using System.Security.Cryptography;
 using System.Windows;
 using System.Windows.Media;
 
@@ -9,17 +8,17 @@ namespace Amam
 	/// <summary>
 	/// Interaktionslogik für frmChangeUser.xaml
 	/// </summary>
-	public partial class FrmChangeUser : Window
+	public partial class FrmChangeUser
 	{
-		UserList usr;
+	    readonly UserList _usr;
 
 		public FrmChangeUser(DataSet parent, string user)
 		{
 			InitializeComponent();
-			usr = new UserList(parent);
+			_usr = new UserList(parent);
 			try
 			{
-				usr.SelectUser(user);
+				_usr.SelectUser(user);
 				tbNewUsername.Text = user;
 			}
 			catch(ArgumentOutOfRangeException ex)
@@ -30,7 +29,7 @@ namespace Amam
 
 		private void OldPasswordChanged(object sender, RoutedEventArgs e)
 		{
-			if(Encryption.CreateHash(tbOldPassword.Password) == usr.PasswordHash)
+			if(Encryption.CreateHash(tbOldPassword.Password) == _usr.PasswordHash)
 			{
 				gbChangeUser.IsEnabled = true;
 				btnChange.IsEnabled = true;
@@ -44,7 +43,7 @@ namespace Amam
 
 		private void Close(object sender, RoutedEventArgs e)
 		{
-			this.Close();
+			Close();
 		}
 
 		private void ChangeUser(object sender, RoutedEventArgs e)
@@ -56,7 +55,7 @@ namespace Amam
 
 				try
 				{
-					usr.ChangeUserName(tbNewUsername.Text);
+					_usr.ChangeUserName(tbNewUsername.Text);
 				}
 				catch(UserNameIsNullOrEmptyException ex)
 				{
@@ -81,8 +80,8 @@ namespace Amam
 					{
 						try
 						{
-							usr.SelectUser(tbNewUsername.Text);
-							usr.ChangePassword(tbNewPassword.Password);
+							_usr.SelectUser(tbNewUsername.Text);
+							_usr.ChangePassword(tbNewPassword.Password);
 						}
 						catch(PasswordIsNullOrEmptyException ex)
 						{
@@ -107,7 +106,7 @@ namespace Amam
 					}
 				}
 
-				this.Close();
+				Close();
 		}
 	}
 }

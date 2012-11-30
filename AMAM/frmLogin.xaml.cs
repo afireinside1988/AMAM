@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Data;
 using System.IO;
-using System.Security.Cryptography;
 using System.Windows;
 using System.Windows.Media;
 using System.Xml;
@@ -11,12 +10,12 @@ namespace Amam
     /// <summary>
     /// Interaktionslogik für MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow
     {
 
-        private string xmlPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "AMAM\\users.xml");
-        XMLInitializer initxml = new XMLInitializer(); //Neuen XML-Initialisierer einbinden
-		DataSet ds = new DataSet();
+        private readonly string _xmlPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "AMAM\\users.xml");
+        readonly XMLInitializer _initxml = new XMLInitializer(); //Neuen XML-Initialisierer einbinden
+        readonly DataSet _ds = new DataSet();
 
         public MainWindow()
         {
@@ -25,19 +24,19 @@ namespace Amam
             InitializeComponent();
 
             string[] xmlFiles = {"users"}; //String-Array mit den benötigten Dateien
-            ds.DataSetName = "users";
+            _ds.DataSetName = "users";
 
-            if(initxml.XMLStructureInitialized(xmlFiles))
+            if(_initxml.XMLStructureInitialized(xmlFiles))
             {
                 InitUserTable();
             }
             else
             {
-                initxml.CreateXMLFileStructure(xmlFiles);
+                _initxml.CreateXMLFileStructure(xmlFiles);
                 MessageBox.Show("Dies ist der erste Start von Ambulance Merseburg Apotheken Manager."+Environment.NewLine + "Sie müssen nun einen Benutzer erstellen.", "Willkommen", MessageBoxButton.OK, MessageBoxImage.Information);
-                FrmAddUser AddUser = new FrmAddUser(ds);
-                AddUser.ShowDialog();
-                ds.WriteXml(xmlPath);
+                var addUser = new FrmAddUser(_ds);
+                addUser.ShowDialog();
+                _ds.WriteXml(_xmlPath);
 				InitUserTable();
             }
         }
@@ -49,22 +48,22 @@ namespace Amam
         {
             cboUsername.Items.Clear();
 			
-            XmlReader xmlFile = XmlReader.Create(xmlPath, new XmlReaderSettings());
+            XmlReader xmlFile = XmlReader.Create(_xmlPath, new XmlReaderSettings());
             try
             {
 
-				if(ds.Tables.Count > 0)
+				if(_ds.Tables.Count > 0)
 				{
-					cboUsername.ItemsSource = ds.Tables["user"].DefaultView;
+					cboUsername.ItemsSource = _ds.Tables["user"].DefaultView;
 					cboUsername.SelectedIndex = 0;
 				}
 				else
 				{
-					ds.ReadXml(xmlFile);
+					_ds.ReadXml(xmlFile);
 					xmlFile.Close();
-					if(ds.Tables.Count > 0)
+					if(_ds.Tables.Count > 0)
 					{
-						cboUsername.ItemsSource = ds.Tables["user"].DefaultView;
+						cboUsername.ItemsSource = _ds.Tables["user"].DefaultView;
 						cboUsername.SelectedIndex = 0;
 					}
 				}
@@ -74,22 +73,22 @@ namespace Amam
                 MessageBox.Show("Die Benutzerdatenbank ist korrupt. Es wird nun eine neue Benutzerdatenbank angelegt." + Environment.NewLine + Environment.NewLine + "Die korrupte Benutzerdatenbank wird gesichert und der Administrator per eMail kontaktiert. Bitte einen Moment Geduld.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
 
 
-                File.Move(xmlPath, xmlPath + ".corrupt");
-                File.Delete(xmlPath);
-                initxml.CreateXMLFileStructure("users");
+                File.Move(_xmlPath, _xmlPath + ".corrupt");
+                File.Delete(_xmlPath);
+                _initxml.CreateXMLFileStructure("users");
 
-                ExceptionReporter ExReport = new ExceptionReporter(ex);
-                ExReport.ReportExceptionToAdmin(xmlPath + ".corrupt");
+                var exReport = new ExceptionReporter(ex);
+                exReport.ReportExceptionToAdmin(_xmlPath + ".corrupt");
             }
             if(!cboUsername.HasItems)
             {
-                MessageBoxResult MessageResult = MessageBox.Show("Die Benutzerdatenbank enthält keinen Benutzer." + Environment.NewLine + "Sie müssen nun einen Benutzer anlegen um fortfahren zu können.", "Fehler", MessageBoxButton.OKCancel, MessageBoxImage.Error);
-                if(MessageResult == MessageBoxResult.OK)
+                MessageBoxResult messageResult = MessageBox.Show("Die Benutzerdatenbank enthält keinen Benutzer." + Environment.NewLine + "Sie müssen nun einen Benutzer anlegen um fortfahren zu können.", "Fehler", MessageBoxButton.OKCancel, MessageBoxImage.Error);
+                if(messageResult == MessageBoxResult.OK)
                 {
-                    FrmAddUser AddUser = new FrmAddUser(ds);
-                    AddUser.ShowDialog();
-                    ds.WriteXml(xmlPath);
-					cboUsername.ItemsSource = ds.Tables["user"].DefaultView;
+                    var addUser = new FrmAddUser(_ds);
+                    addUser.ShowDialog();
+                    _ds.WriteXml(_xmlPath);
+					cboUsername.ItemsSource = _ds.Tables["user"].DefaultView;
 					cboUsername.SelectedIndex = 0;
                 }
                 else
@@ -101,7 +100,7 @@ namespace Amam
 
         private void Close(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            Close();
         }
 
         private void LogIn(object sender, RoutedEventArgs e)
@@ -111,10 +110,9 @@ namespace Amam
 
             if(Encryption.CreateHash(tbPassword.Password) == cboUsername.SelectedValue.ToString())
             {
-				FrmMain MainForm = new FrmMain();
-				MainForm.Show();
-				this.Close();
-				//MessageBox.Show("Das Passwort ist richtig.", "Hinweis", MessageBoxButton.OK, MessageBoxImage.Information);
+				var mainForm = new FrmMain();
+				mainForm.Show();
+				Close();
             }
             else
             {

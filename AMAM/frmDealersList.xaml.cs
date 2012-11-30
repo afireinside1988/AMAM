@@ -8,9 +8,9 @@ namespace Amam
 	/// <summary>
 	/// Interaktionslogik für frmDealersList.xaml
 	/// </summary>
-	public partial class FrmDealersList : Window
+	public partial class FrmDealersList
 	{
-		DataTable dt = new DataTable();
+	    readonly DataTable _dt = new DataTable();
 
 		public FrmDealersList()
 		{
@@ -22,11 +22,9 @@ namespace Amam
 		private void SearchForDataBase()
 		{
 
-			SqlConnectionStringBuilder ConnStringBuilder = new SqlConnectionStringBuilder();
-			ConnStringBuilder.DataSource = "localhost";
-			ConnStringBuilder.IntegratedSecurity = true;
+			var connStringBuilder = new SqlConnectionStringBuilder {DataSource = "localhost", IntegratedSecurity = true};
 
-			using(SqlConnection sqlConn = new SqlConnection(ConnStringBuilder.ToString()))
+		    using(var sqlConn = new SqlConnection(connStringBuilder.ToString()))
 			{
 				try
 				{
@@ -34,7 +32,7 @@ namespace Amam
 					DataTable tblDatabases = sqlConn.GetSchema("Databases");
 					sqlConn.Close();
 
-					tblDatabases.PrimaryKey = new DataColumn[] {tblDatabases.Columns["database_name"]};
+					tblDatabases.PrimaryKey = new[] {tblDatabases.Columns["database_name"]};
 					if(tblDatabases.Rows.Contains("AMAM"))
 					{
 						btnAddDealer.IsEnabled = true;
@@ -44,11 +42,11 @@ namespace Amam
 						try
 						{
 							sqlConn.Open();
-                            SqlCommand newDataBaseCommand = new SqlCommand("CREATE DATABASE AMAM", sqlConn);
+                            var newDataBaseCommand = new SqlCommand("CREATE DATABASE AMAM", sqlConn);
 							newDataBaseCommand.ExecuteNonQuery();
 							tblDatabases = sqlConn.GetSchema("Databases");
 
-							tblDatabases.PrimaryKey = new DataColumn[] { tblDatabases.Columns["database_name"] };
+							tblDatabases.PrimaryKey = new[] { tblDatabases.Columns["database_name"] };
 							if(tblDatabases.Rows.Contains("AMAM"))
 							{
 								btnAddDealer.IsEnabled = true;
@@ -56,10 +54,9 @@ namespace Amam
 						}
 						catch(SqlException ex)
 						{
-							ExceptionReporter Reporter = new ExceptionReporter(ex);
-							Reporter.ReportExceptionToAdmin();
+							var reporter = new ExceptionReporter(ex);
+							reporter.ReportExceptionToAdmin();
 							MessageBox.Show("Auf den SQL-Server konnte nicht zugegriffen werden. Ein Fehlerbericht wurde an den Administrator gesendet.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
-							return;
 						}
 						finally
 						{
@@ -72,55 +69,53 @@ namespace Amam
 				}
 				catch(SqlException ex)
 				{
-					ExceptionReporter Reporter = new ExceptionReporter(ex);
-					Reporter.ReportExceptionToAdmin();
+					var reporter = new ExceptionReporter(ex);
+					reporter.ReportExceptionToAdmin();
 					MessageBox.Show("Auf den SQL-Server konnte nicht zugegriffen werden. Ein Fehlerbericht wurde an den Administrator gesendet.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
-					return;
 				}
 			}
 		}
 
 		private void RefreshDataBase()
 		{
-            dt.Clear();
-			SqlConnectionStringBuilder ConnStringBuilder = new SqlConnectionStringBuilder();
-			ConnStringBuilder.DataSource = "localhost";
-			ConnStringBuilder.IntegratedSecurity = true;
-			ConnStringBuilder.InitialCatalog = "AMAM";
+            _dt.Clear();
+			var connStringBuilder = new SqlConnectionStringBuilder
+			    {
+			        DataSource = "localhost",
+			        IntegratedSecurity = true,
+			        InitialCatalog = "AMAM"
+			    };
 
-			using(SqlConnection sqlConn = new SqlConnection(ConnStringBuilder.ToString()))
+		    using(var sqlConn = new SqlConnection(connStringBuilder.ToString()))
 			{
 				try
 				{
 					sqlConn.Open();
-					if(sqlhelper.TableExists(sqlConn, "Dealers"))
+					if(Sqlhelper.TableExists(sqlConn, "Dealers"))
 					{
-						SqlDataAdapter dataAdapter = new SqlDataAdapter("SELECT * FROM Dealers", sqlConn);
-						SqlCommandBuilder cmdBuilder = new SqlCommandBuilder(dataAdapter);
-						dataAdapter.Fill(dt);
+						var dataAdapter = new SqlDataAdapter("SELECT * FROM Dealers", sqlConn);
+						dataAdapter.Fill(_dt);
 					}
 					else
 					{
-						SqlCommand newTable = new SqlCommand("CREATE TABLE Dealers (VertriebID int IDENTITY(1,1 )CONSTRAINT pkVertriebID PRIMARY KEY, "+
-																"Vertrieb nvarchar(255) NOT NULL, "+ 
-																"eMail nvarchar(255) NOT NULL, " +
-																"Kundennummer nvarchar(255) NOT NULL)", sqlConn);
+						var newTable = new SqlCommand("CREATE TABLE Dealers (VertriebID int IDENTITY(1,1 )CONSTRAINT pkVertriebID PRIMARY KEY, "+
+														"Vertrieb nvarchar(255) NOT NULL, "+ 
+														"eMail nvarchar(255) NOT NULL, " +
+														"Kundennummer nvarchar(255) NOT NULL)", sqlConn);
 						newTable.ExecuteNonQuery();
 
-						SqlDataAdapter dataAdapter = new SqlDataAdapter("SELECT * FROM Dealers;", sqlConn);
-						SqlCommandBuilder cmdBuilder = new SqlCommandBuilder(dataAdapter);
-						dataAdapter.Fill(dt);
+						var dataAdapter = new SqlDataAdapter("SELECT * FROM Dealers;", sqlConn);
+						dataAdapter.Fill(_dt);
 					}
-					dt.PrimaryKey = new DataColumn[] { dt.Columns["pkVertriebID"] };
-					dgDealers.DataContext = dt;
+					_dt.PrimaryKey = new[] { _dt.Columns["pkVertriebID"] };
+					dgDealers.DataContext = _dt;
                     dgDealers.SelectedValuePath = "VertriebID";
 				}
 				catch(SqlException ex)
 				{
-					ExceptionReporter Reporter = new ExceptionReporter(ex);
-					Reporter.ReportExceptionToAdmin();
+					var reporter = new ExceptionReporter(ex);
+					reporter.ReportExceptionToAdmin();
 					MessageBox.Show("Auf die Datenbank konnte nicht zugegriffen werden. Ein Fehlerbericht wurde an den Administrator gesendet.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
-					return;
 				}
 				finally
 				{
@@ -134,44 +129,45 @@ namespace Amam
 
 		private void Close(object sender, RoutedEventArgs e)
 		{
-			this.Close();
+			Close();
 		}
 
 		private void AddDealer(object sender, RoutedEventArgs e)
 		{
-			FrmAddDealer AddDealer = new FrmAddDealer();
-			AddDealer.ShowDialog();
+			var addDealer = new FrmAddDealer();
+			addDealer.ShowDialog();
 			RefreshDataBase();
 		}
 
         private void RemoveDealer(object sender, RoutedEventArgs e)
         {
-            MessageBoxResult ExecuteRemove = MessageBox.Show("Sind Sie sicher, dass Sie den Vertrieb " + dgDealers.SelectedValue.ToString() + " löschen möchten?", "Vertrieb löschen", MessageBoxButton.YesNo, MessageBoxImage.Question);
-            if(ExecuteRemove == MessageBoxResult.Yes)
+            MessageBoxResult executeRemove = MessageBox.Show("Sind Sie sicher, dass der Vertrieb " + dgDealers.SelectedValue + " gelöscht werden soll?", "Vertrieb löschen", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if(executeRemove == MessageBoxResult.Yes)
             {
-                SqlConnectionStringBuilder ConnStringBuilder = new SqlConnectionStringBuilder();
-                ConnStringBuilder.DataSource = "localhost";
-                ConnStringBuilder.IntegratedSecurity = true;
-                ConnStringBuilder.InitialCatalog = "AMAM";
+                var connStringBuilder = new SqlConnectionStringBuilder
+                    {
+                        DataSource = "localhost",
+                        IntegratedSecurity = true,
+                        InitialCatalog = "AMAM"
+                    };
 
-                using(SqlConnection sqlConn = new SqlConnection(ConnStringBuilder.ToString()))
+                using(var sqlConn = new SqlConnection(connStringBuilder.ToString()))
                 {
                     try
                     {
                         sqlConn.Open();
 
-                        SqlCommand RemoveDealerCommand = new SqlCommand("DELETE FROM Dealers WHERE VertriebID = @paramPK", sqlConn);
-                        RemoveDealerCommand.Parameters.Add(new SqlParameter("@paramPK", dgDealers.SelectedValue));
+                        var removeDealerCommand = new SqlCommand("DELETE FROM Dealers WHERE VertriebID = @paramPK", sqlConn);
+                        removeDealerCommand.Parameters.Add(new SqlParameter("@paramPK", dgDealers.SelectedValue));
 
-                        RemoveDealerCommand.ExecuteNonQuery();
+                        removeDealerCommand.ExecuteNonQuery();
                         RefreshDataBase();
                     }
                     catch(SqlException ex)
                     {
-                        ExceptionReporter Reporter = new ExceptionReporter(ex);
-                        Reporter.ReportExceptionToAdmin();
+                        var reporter = new ExceptionReporter(ex);
+                        reporter.ReportExceptionToAdmin();
                         MessageBox.Show("Auf die Datenbank konnte nicht zugegriffen werden. Ein Fehlerbericht wurde an den Administrator gesendet.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
-                        return;
                     }
                     finally
                     {
@@ -181,10 +177,6 @@ namespace Amam
                         }
                     }
                 }
-            }
-            else
-            {
-                return;
             }
         }
 
@@ -204,8 +196,8 @@ namespace Amam
 
         private void ChangeDealer(object sender, RoutedEventArgs e)
         {
-            FrmChangeDealer ChangeDealerForm = new FrmChangeDealer(dgDealers.SelectedValue.ToString());
-            ChangeDealerForm.ShowDialog();
+            var changeDealerForm = new FrmChangeDealer(dgDealers.SelectedValue.ToString());
+            changeDealerForm.ShowDialog();
             RefreshDataBase();
         }
 	}

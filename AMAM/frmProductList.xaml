@@ -10,20 +10,28 @@
         <DockPanel DockPanel.Dock="Bottom">
             <Button DockPanel.Dock="Left" Margin="5" Padding="5" Content="Produkt hinzufügen" Click="AddProduct"/>
             <Button DockPanel.Dock="Left" Margin="5" Padding="5" Content="Produkt bearbeiten"/>
-            <Button DockPanel.Dock="Left" Margin="5" Padding="5" Content="Produkt löschen"/>
+            <Button DockPanel.Dock="Left" Margin="5" Padding="5" Content="Produkt löschen" Click="RemovePoduct"/>
             <Button DockPanel.Dock="Right" HorizontalAlignment="Right" Margin="5" Padding="5" Content="Schließen" Click="Close"/>            
         </DockPanel>
-        <ListView x:Name="lvProducts" DockPanel.Dock="Top" MinHeight="100" SelectionChanged="SelectedProductChanged">
-           
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn x:Name="ProductNameColumn" Header="Produkt" DisplayMemberBinding="{Binding Path=Produktname}" Width="Auto"/>
-                    <GridViewColumn x:Name="UnitColumn" Header="Verkaufseinheit" DisplayMemberBinding="{Binding Path=Einheit}" Width="Auto"/>
-                </GridView>
-            </ListView.View>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <GridSplitter Height="3" Grid.Column="0" Grid.Row="1" ResizeDirection="Rows" Grid.ColumnSpan="1" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
             
-        </ListView>
-        <Label Content="Datensätze für das Produkt:" DockPanel.Dock="Top" Padding="0" Margin="5"/>
-        <DataGrid x:Name="dgProductData" ItemsSource="{Binding}" IsReadOnly="True"></DataGrid>
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="0" Grid.Column="0">
+                <DataGrid x:Name="dgProducts" MinHeight="100" SelectionChanged="SelectedProductChanged" SelectionMode="Extended" IsReadOnly="True" GridLinesVisibility="None"/>
+            </ScrollViewer>
+            <Label Grid.Column="0" Grid.Row="1" Content="Datensätze für das Produkt:" Padding="0" Margin="5"/>
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Column="0" Grid.Row="3">
+                 <DataGrid x:Name="dgProductData" ItemsSource="{Binding}" IsReadOnly="True" MinHeight="100" GridLinesVisibility="None"/>
+            </ScrollViewer>
+        </Grid>
+      
     </DockPanel>
 </Window>

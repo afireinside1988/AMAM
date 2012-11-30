@@ -6,41 +6,34 @@ namespace Amam
 	/// <summary>
 	/// Interaktionslogik für frmConfirmDelete.xaml
 	/// </summary>
-	public partial class FrmDeleteUser : Window
+	public partial class FrmDeleteUser
 	{
-		DataSet ds;
-		string user;
+	    readonly DataSet _ds;
+	    readonly string _user;
 
 		public FrmDeleteUser(DataSet parent, string selectedUser)
 		{
 			InitializeComponent();
-			ds = parent;
-			user = selectedUser;
+			_ds = parent;
+			_user = selectedUser;
 		}
 
 		private void PasswordChanged(object sender, RoutedEventArgs e)
 		{
-			if(tbPassword.Password.Length > 0)
-			{
-				btnDelete.IsEnabled = true;
-			}
-			else
-			{
-				btnDelete.IsEnabled = false;
-			}
+		    btnDelete.IsEnabled = tbPassword.Password.Length > 0;
 		}
 
-		private void Close(object sender, RoutedEventArgs e)
+	    private void Close(object sender, RoutedEventArgs e)
 		{
-			this.Close();
+			Close();
 		}
 
 		private void DeleteUser(object sender, RoutedEventArgs e)
 		{
-			UserList usr = new UserList(ds);
-			usr.SelectUser(user);
+			var usr = new UserList(_ds);
+			usr.SelectUser(_user);
 			usr.DeleteUser();
-			this.Close();
+			Close();
 		}
 
 	}

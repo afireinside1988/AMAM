@@ -8,14 +8,14 @@ namespace Amam
     /// <summary>
     /// Interaktionslogik für frmAddUser.xaml
     /// </summary>
-    public partial class FrmAddUser : Window
+    public partial class FrmAddUser
     {
-        DataSet ds;
+        readonly DataSet _ds;
 
         public FrmAddUser(DataSet parent)
         {
             InitializeComponent();
-            ds = parent;
+            _ds = parent;
         }
 
         /// <summary>
@@ -30,14 +30,14 @@ namespace Amam
                 tbPassword.Background = Brushes.White;
                 tbPassword.Foreground = Brushes.Black;
 
-                UserList usr = new UserList(ds);
+                var usr = new UserList(_ds);
 
 				if(tbPassword.Password == tbPasswordConfirm.Password)
 				{
 					try
 					{
 						usr.CreateUser(tbUsername.Text, tbPassword.Password);
-						this.Close();
+						Close();
 					}
 					catch(UserNameIsNullOrEmptyException ex)
 					{
@@ -77,7 +77,7 @@ namespace Amam
         /// <param name="e"></param>
         private void Close(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            Close();
         }
     }
 }

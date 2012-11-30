@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Amam
+﻿namespace Amam
 {
 	class PackageMass
 	{
-		private int internalCounter = 0;
+		private readonly int _internalCounter;
 
 		public int PackageMassValue
 		{
@@ -22,11 +16,11 @@ namespace Amam
 			private set;
 		}
 
-		public PackageMass(string MassName)
+		public PackageMass(string massName)
 		{
-			PackageMassValue = internalCounter;
-			PackageMassName = MassName;
-			internalCounter++;
+			PackageMassValue = _internalCounter;
+			PackageMassName = massName;
+			_internalCounter++;
 		}
 	}
 }

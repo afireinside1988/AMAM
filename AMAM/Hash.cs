@@ -1,7 +1,8 @@
-﻿using System.Text;
-using System.Windows;
+﻿using System;
+using System.Security.Cryptography;
+using System.Text;
 
-namespace System.Security.Cryptography
+namespace Amam
 {
     /// <summary>
     /// Klasse zur Erzeugung und Verarbeitung von Salted Hashs;
@@ -16,12 +17,11 @@ namespace System.Security.Cryptography
 		/// <returns>Gibt den aus value erzeugten Hash wieder</returns>
 		public static string CreateHash(string value)
 		{
-			Byte[] PlainTextArray = Encoding.UTF8.GetBytes(value);
-			MD5CryptoServiceProvider Hasher = new MD5CryptoServiceProvider();
-			Byte[] HashBytes;
+			Byte[] plainTextArray = Encoding.UTF8.GetBytes(value);
+			var hasher = new MD5CryptoServiceProvider();
 
-			HashBytes = Hasher.ComputeHash(PlainTextArray);
-			return BitConverter.ToString(HashBytes).Replace("-", "");
+		    byte[] hashBytes = hasher.ComputeHash(plainTextArray);
+			return BitConverter.ToString(hashBytes).Replace("-", "");
 		}
     }
 }

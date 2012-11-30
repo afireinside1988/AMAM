@@ -11,7 +11,7 @@
         <StackPanel Orientation="Horizontal">
             <StackPanel>
                 <Label Content="Vertriebspartner:" Padding="0" Margin="5" Height="{Binding ActualHeight, ElementName=tbDealer, Mode=OneWay}"/>
-                <Label x:Name="label" Content="eMail-Adresse:" Padding="0" Margin="5" Height="{Binding ActualHeight, ElementName=tbMail, Mode=OneWay}"/>
+                <Label Content="eMail-Adresse:" Padding="0" Margin="5" Height="{Binding ActualHeight, ElementName=tbMail, Mode=OneWay}"/>
                 <Label Content="Kundennummer:" Padding="0" Grid.IsSharedSizeScope="True" Margin="5" Height="{Binding ActualHeight, ElementName=tbCustomerID, Mode=OneWay}"/>
             </StackPanel>
             <StackPanel MinWidth="300">

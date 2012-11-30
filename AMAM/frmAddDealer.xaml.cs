@@ -7,27 +7,29 @@ namespace Amam
 	/// <summary>
 	/// Interaktionslogik für frmAddDealer.xaml
 	/// </summary>
-	public partial class FrmAddDealer : Window
+	public partial class FrmAddDealer
 	{
 		public FrmAddDealer()
 		{
 			InitializeComponent();
 		}
 
-		private void AddDealerToDataBase(string dealerName, string mail, string cutomerID)
+		private static void AddDealerToDataBase(string dealerName, string mail, string cutomerID)
 		{
-            SqlConnectionStringBuilder ConnStringBuilder = new SqlConnectionStringBuilder();
-            ConnStringBuilder.DataSource = "localhost";
-            ConnStringBuilder.IntegratedSecurity = true;
-            ConnStringBuilder.InitialCatalog = "AMAM";
+            var connStringBuilder = new SqlConnectionStringBuilder
+                {
+                    DataSource = "localhost",
+                    IntegratedSecurity = true,
+                    InitialCatalog = "AMAM"
+                };
 
-            using(SqlConnection sqlConn = new SqlConnection(ConnStringBuilder.ToString()))
+		    using(var sqlConn = new SqlConnection(connStringBuilder.ToString()))
             {
                 try
                 {
                     sqlConn.Open();
-                    SqlCommand newRowCommand = new SqlCommand("INSERT INTO Dealers (Vertrieb, eMail, Kundennummer) "+
-                                                                "VALUES(@paramVertrieb, @paramMail, @paramCustomerID)", sqlConn);
+                    var newRowCommand = new SqlCommand("INSERT INTO Dealers (Vertrieb, eMail, Kundennummer) "+
+                                                       "VALUES(@paramVertrieb, @paramMail, @paramCustomerID)", sqlConn);
  
                     newRowCommand.Parameters.Add(new SqlParameter("@paramVertrieb", dealerName));
                     newRowCommand.Parameters.Add(new SqlParameter("@paramMail", mail));
@@ -37,10 +39,9 @@ namespace Amam
                 }
                 catch(SqlException ex)
                 {
-                    ExceptionReporter Reporter = new ExceptionReporter(ex);
-                    Reporter.ReportExceptionToAdmin();
+                    var reporter = new ExceptionReporter(ex);
+                    reporter.ReportExceptionToAdmin();
                     MessageBox.Show("Auf die Datenbank konnte nicht zugegriffen werden. Ein Fehlerbericht wurde an den Administrator gesendet.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
                 }
                 finally
                 {
@@ -54,7 +55,7 @@ namespace Amam
 
 		private void Close(object sender, RoutedEventArgs e)
 		{
-			this.Close();
+			Close();
 		}
 
         private void AddDealer(object sender, RoutedEventArgs e)
@@ -66,12 +67,12 @@ namespace Amam
             tbCustomerID.Background = Brushes.White;
             tbCustomerID.Foreground = Brushes.Black;
 
-            Validator validator = new Validator();
+            var validator = new Validator();
 
             if(tbDealer.Text.Length > 0 && validator.IsMailValid(tbMail.Text) && tbCustomerID.Text.Length > 0)
             {
                 AddDealerToDataBase(tbDealer.Text, tbMail.Text, tbCustomerID.Text);
-                this.Close();
+                Close();
             }
             else
             {

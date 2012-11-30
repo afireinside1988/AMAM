@@ -1,16 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using System.Data.SqlClient;
 using System.Data;
 
@@ -19,25 +8,27 @@ namespace Amam
 	/// <summary>
 	/// Interaktionslogik für frmProductList.xaml
 	/// </summary>
-	public partial class FrmProductList : Window
+	public partial class FrmProductList
 	{
-		DataTable ProductsTable = new DataTable();
+	    readonly DataTable _productsTable = new DataTable();
 
 		public FrmProductList()
 		{
 			InitializeComponent();
 
-			SqlConnectionStringBuilder ConnString = new SqlConnectionStringBuilder();
-			ConnString.DataSource = "localhost";
-			ConnString.InitialCatalog = "AMAM";
-			ConnString.IntegratedSecurity = true;
+			var connString = new SqlConnectionStringBuilder
+			    {
+			        DataSource = "localhost",
+			        InitialCatalog = "AMAM",
+			        IntegratedSecurity = true
+			    };
 
-			using(SqlConnection sqlConn = new SqlConnection(ConnString.ToString()))
+		    using(var sqlConn = new SqlConnection(connString.ToString()))
 			{
 				try
 				{
 					sqlConn.Open();
-					if(sqlhelper.TableExists(sqlConn, "ProductNames") && sqlhelper.TableExists(sqlConn, "ProductData") && sqlhelper.TableExists(sqlConn, "Dealers"))
+					if(Sqlhelper.TableExists(sqlConn, "ProductNames") && Sqlhelper.TableExists(sqlConn, "ProductData") && Sqlhelper.TableExists(sqlConn, "Dealers"))
 					{
 						sqlConn.Close();
 						RefreshProductList();
@@ -45,8 +36,8 @@ namespace Amam
 				}
 				catch(SqlException ex)
 				{
-					ExceptionReporter Reporter = new ExceptionReporter(ex);
-					Reporter.ReportExceptionToAdmin();
+					var reporter = new ExceptionReporter(ex);
+					reporter.ReportExceptionToAdmin();
 					MessageBox.Show("Auf die Datenbank konnte nicht zugegriffen werden. Ein Fehlerbericht wurde an den Administrator gesendet.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
 				}
 				finally
@@ -61,35 +52,37 @@ namespace Amam
 
 		private void RefreshProductList()
 		{
-			SqlConnectionStringBuilder ConnString = new SqlConnectionStringBuilder();
-			ConnString.DataSource = "localhost";
-			ConnString.InitialCatalog = "AMAM";
-			ConnString.IntegratedSecurity = true;
+			var connString = new SqlConnectionStringBuilder
+			    {
+			        DataSource = "localhost",
+			        InitialCatalog = "AMAM",
+			        IntegratedSecurity = true
+			    };
 
-			using(SqlConnection sqlConn = new SqlConnection(ConnString.ToString()))
+		    using(var sqlConn = new SqlConnection(connString.ToString()))
 			{
 				try
 				{
 					sqlConn.Open();
 
-					string command = "SELECT ProductNames.Produktnummer, ProductNames.Produktname, Units.Einheit FROM ProductNames " +
-										"INNER JOIN ProductData ON ProductData.Produktnummer = ProductNames.Produktnummer " +
-										"INNER JOIN Units ON Units.EinheitID = ProductData.EinheitID " + 
-										"GROUP BY ProductNames.Produktnummer, ProductNames.Produktname, Units.Einheit";
+					const string command = "SELECT ProductNames.Produktnummer, ProductNames.Produktname, Units.Einheit FROM ProductNames " +
+					                       "INNER JOIN ProductData ON ProductData.Produktnummer = ProductNames.Produktnummer " +
+					                       "INNER JOIN Units ON Units.EinheitID = ProductData.EinheitID " + 
+					                       "GROUP BY ProductNames.Produktnummer, ProductNames.Produktname, Units.Einheit";
 										
 
-					SqlDataAdapter dataAdapter = new SqlDataAdapter(command, sqlConn);
-					SqlCommandBuilder sqlCommand = new SqlCommandBuilder(dataAdapter);
-					dataAdapter.Fill(ProductsTable);
+					var dataAdapter = new SqlDataAdapter(command, sqlConn);
+                    _productsTable.Clear();
+					dataAdapter.Fill(_productsTable);
 
-					lvProducts.ItemsSource = ProductsTable.DefaultView;
-					lvProducts.SelectedValuePath = "Produktnummer";
+					dgProducts.ItemsSource = _productsTable.DefaultView;
+					dgProducts.SelectedValuePath = "Produktnummer";
 
 				}
 				catch(SqlException ex)
 				{
-					ExceptionReporter Reporter = new ExceptionReporter(ex);
-					Reporter.ReportExceptionToAdmin();
+					var reporter = new ExceptionReporter(ex);
+					reporter.ReportExceptionToAdmin();
 					MessageBox.Show("Auf die Datenbank konnte nicht zugegriffen werden. Ein Fehlerbericht wurde an den Administrator gesendet.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
 				}
 				finally
@@ -104,26 +97,116 @@ namespace Amam
 
 		private void Close(object sender, RoutedEventArgs e)
 		{
-			this.Close();
+			Close();
 		}
 
 		private void AddProduct(object sender, RoutedEventArgs e)
 		{
-			FrmAddProduct AddProduct = new FrmAddProduct();
-			AddProduct.ShowDialog();
+		    var addProduct = new FrmAddProduct();
+		    addProduct.ShowDialog();
 			RefreshProductList();
 		}
 
 		private void ChangeFilter(object sender, TextChangedEventArgs e)
 		{
-			ProductsTable.DefaultView.RowFilter = "Produktname LIKE '" + tbFilter.Text + "*'";
+			_productsTable.DefaultView.RowFilter = "Produktname LIKE '*" + tbFilter.Text + "*'";
 		}
 
 		private void SelectedProductChanged(object sender, SelectionChangedEventArgs e)
 		{
-			//todo DataGrid mit ProductData füllen wenn Produkt gewählt wird
-			//todo evtl. Gridsplitter im Design?
+
+			var connString = new SqlConnectionStringBuilder
+			    {
+			        DataSource = "localhost",
+			        InitialCatalog = "AMAM",
+			        IntegratedSecurity = true
+			    };
+
+		    using(var sqlConn = new SqlConnection(connString.ToString()))
+			{
+				try
+				{
+
+					sqlConn.Open();
+
+					const string command = "SELECT Dealers.Vertrieb, ProductData.Artikelnummer, ProductData.Preis FROM ProductData " +
+					                       "INNER JOIN Dealers ON ProductData.VertriebID = Dealers.VertriebID " +
+					                       "INNER JOIN Units ON Units.Einheit = @paramEinheit " +
+					                       "WHERE ProductData.Produktnummer = @paramProduktnummer " +
+					                       "AND ProductData.EinheitID = Units.EinheitID";
+
+					var dataAdapter = new SqlDataAdapter {SelectCommand = new SqlCommand(command, sqlConn)};
+
+				    if(dgProducts.SelectedItem != null)
+                    {
+                        var currentRowView = (DataRowView)dgProducts.SelectedItem;
+                        DataRow row = currentRowView.Row;
+
+                        dataAdapter.SelectCommand.Parameters.Add(new SqlParameter("@paramProduktnummer", row["Produktnummer"].ToString()));
+                        dataAdapter.SelectCommand.Parameters.Add(new SqlParameter("@paramEinheit", row["Einheit"].ToString()));
+                        var productDataTable = new DataTable();
+                        dataAdapter.Fill(productDataTable);
+
+                        dgProductData.DataContext = productDataTable.DefaultView;
+                    }
+                    else dgProductData.DataContext = null;
+                    
+				}
+				catch(SqlException ex)
+				{
+					var reporter = new ExceptionReporter(ex);
+					reporter.ReportExceptionToAdmin();
+					MessageBox.Show("Auf die Datenbank konnte nicht zugegriffen werden. Ein Fehlerbericht wurde an den Administrator gesendet.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
+				}
+				finally
+				{
+					if(sqlConn.State == ConnectionState.Open)
+					{
+						sqlConn.Close();
+					}
+				}
+			}
 		}
+
+        private void RemovePoduct(object sender, RoutedEventArgs e)
+        {
+            var currentRow = (DataRowView)dgProducts.SelectedItem;
+            DataRow selectedRow = currentRow.Row;
+            MessageBoxResult removeQuestion = MessageBox.Show("Sind Sie sicher, dass das Produkt " + selectedRow["Produktname"] + " gelöscht werden soll?", "Produkt löschen", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (removeQuestion != MessageBoxResult.Yes) return;
+
+            var connString = new SqlConnectionStringBuilder
+                {
+                    DataSource = "localhost",
+                    InitialCatalog = "AMAM",
+                    IntegratedSecurity = true
+                };
+
+            using (var sqlConn = new SqlConnection(connString.ToString()))
+            {
+                try
+                {
+                    sqlConn.Open();
+
+                    //todo hier Lösch-Kommando ausführen
+                }
+                catch (SqlException ex)
+                {
+                    var reporter = new ExceptionReporter(ex);
+                    reporter.ReportExceptionToAdmin();
+                    MessageBox.Show(
+                        "Auf die Datenbank konnte nicht zugegriffen werden. Ein Fehlerbericht wurde an den Administrator gesendet.",
+                        "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                finally
+                {
+                    if (sqlConn.State == ConnectionState.Open)
+                    {
+                        sqlConn.Close();
+                    }
+                }
+            }
+        }
 
 	}
 }

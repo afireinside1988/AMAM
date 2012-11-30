@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Xml;
 using System.Xml.Linq;
 
 namespace Amam
@@ -10,31 +9,28 @@ namespace Amam
     /// </summary>
     class XMLInitializer
     {
-        private string ApplicationDataPath; //Pfad zum AppData-Verzeichnis der Anwendung
+        private readonly string _applicationDataPath; //Pfad zum AppData-Verzeichnis der Anwendung
 
         public XMLInitializer()
         {
-            ApplicationDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "AMAM\\");
+            _applicationDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "AMAM\\");
         }
 
         /// <summary>
         /// Funktion, die Untersucht, ob die XML-Datei-Struktur im Anwendungspfad existiert und das Ergebnis als Wert vom Typ Boolean zurückgibt
         /// </summary>
-        /// <param name="XMLFiles">String-Array, dass die Dateinamen ohne Datei-Endung beinhaltet</param>
+        /// <param name="xmlFiles">String-Array, dass die Dateinamen ohne Datei-Endung beinhaltet</param>
         /// <returns>Gibt True zurück, wenn die Dateistruktur existiert, ansonsten False</returns>
-        public Boolean XMLStructureInitialized(params string[] XMLFiles)
+        public Boolean XMLStructureInitialized(params string[] xmlFiles)
         {
 
-            foreach(string XMLFile in XMLFiles)
+            foreach(string xmlFile in xmlFiles)
             {
-                if(File.Exists(ApplicationDataPath + XMLFile + ".xml"))
+                if(File.Exists(_applicationDataPath + xmlFile + ".xml"))
                 {
                     return true;
                 }
-                else
-                {
-                    return false;
-                }
+                return false;
             }
             return false;
         }
@@ -42,21 +38,21 @@ namespace Amam
         /// <summary>
         /// Metohde, um die XML-DateiStruktur zu erstellen
         /// </summary>
-        /// <param name="XMLFiles"></param>
-        public void CreateXMLFileStructure(params string[] XMLFiles)
+        /// <param name="xmlFiles"></param>
+        public void CreateXMLFileStructure(params string[] xmlFiles)
         {
-            foreach(string XMLFile in XMLFiles)
+            foreach(string xmlFile in xmlFiles)
             {
-                XDocument xmlFile = new XDocument(
+                var xmlDoc = new XDocument(
                     new XDeclaration("1.0", "utf-8", "yes"),
-                    new XElement(XMLFile)
+                    new XElement(xmlFile)
                 );
 
-                if(!Directory.Exists(ApplicationDataPath))
+                if(!Directory.Exists(_applicationDataPath))
                 {
-                    Directory.CreateDirectory(ApplicationDataPath);
+                    Directory.CreateDirectory(_applicationDataPath);
                 }
-                xmlFile.Save(ApplicationDataPath + XMLFile + ".xml");
+                xmlDoc.Save(_applicationDataPath + xmlFile + ".xml");
             }
         }
 

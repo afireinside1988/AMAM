@@ -9,39 +9,36 @@ namespace Amam
         /// <summary>
         /// Variable, die die Validität einer eMail-Adresse zurückgibt
         /// </summary>
-        private bool boolMailInvalid = false;
+        private bool _boolMailInvalid;
 
         /// <summary>
         /// Überprüft einen String auf Zeichen, die ein XML-Dokument nicht enthalten darf
         /// </summary>
         /// <param name="value">Übergibt den String, der auf XML-Validität geprüft werden soll</param>
         /// <returns>Gibt True zurück, wenn der String XML-valide ist</returns>
-        public static bool IsXMLValid(string value)
-        { 
+        public static bool IsXmlValid(string value)
+        {
             if(value.Contains("&") || value.Contains("<") || value.Contains(">") || value.Contains("'") || value.Contains("»"))
             {
                 return false;
             }
-            else
-            {
-                return true;
-            }
+            return true;
         }
 
         /// <summary>
         /// Überprüft einen String darauf, ob es sich um eine gültige eMail-Adresse handelt.
         /// </summary>
-        /// <param name="MailAdress">Übergibt den String, der die eMail-Adresse enthält</param>
+        /// <param name="mailAdress">Übergibt den String, der die eMail-Adresse enthält</param>
         /// <returns>Gibt True zurück, wenn es sich bei dem String um eine gültige eMail-Adresse handelt</returns>
-        public bool IsMailValid(string MailAdress)
+        public bool IsMailValid(string mailAdress)
         {
-            if(string.IsNullOrEmpty(MailAdress)) return false;
+            if(string.IsNullOrEmpty(mailAdress)) return false;
 
-			MailAdress = Regex.Replace(MailAdress, "(@)(.+)$", this.DomainMapper, RegexOptions.None, TimeSpan.FromMilliseconds(200));
+			mailAdress = Regex.Replace(mailAdress, "(@)(.+)$", DomainMapper, RegexOptions.None, TimeSpan.FromMilliseconds(200));
 
-            if(boolMailInvalid) return false;
+            if(_boolMailInvalid) return false;
             
-			return Regex.IsMatch(MailAdress, @"^(?("")(""[^""]+?""@)|(([0-9a-z]((\.(?!\.))|[-!#\$%&'\*\+/=\?\^`\{\}\|~\w])*)(?<=[0-9a-z])@))(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-z][-\w]*[0-9a-z]*\.)+[a-z0-9]{2,17}))$", RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250));
+			return Regex.IsMatch(mailAdress, @"^(?("")(""[^""]+?""@)|(([0-9a-z]((\.(?!\.))|[-!#\$%&'\*\+/=\?\^`\{\}\|~\w])*)(?<=[0-9a-z])@))(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-z][-\w]*[0-9a-z]*\.)+[a-z0-9]{2,17}))$", RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250));
         }
 
 		public static string FormatPrice(string value)
@@ -61,8 +58,7 @@ namespace Amam
 			}
 			if(Regex.IsMatch(value, "[0-9]+(,)[0-9]{0,2}"))
 			{
-				string[] cent;
-				cent = value.Split(Convert.ToChar(","));
+			    string[] cent = value.Split(Convert.ToChar(","));
 				if(cent[1].Length < 2)
 				{
 					cent[1] += "0";
@@ -70,12 +66,12 @@ namespace Amam
 				}
 				return value;
 			}
-			else throw new ArgumentInvalidException("Bitte geben Sie einen gültigen Preis ein.");
+		    throw new ArgumentInvalidException("Bitte geben Sie einen gültigen Preis ein.");
 		}
         
         private string DomainMapper(Match match)
         {
-            IdnMapping idn = new IdnMapping();
+            var idn = new IdnMapping();
             string domainName = match.Groups[2].Value;
 
             try
@@ -84,7 +80,7 @@ namespace Amam
             }
             catch (ArgumentException)
                 {
-                    boolMailInvalid = false;
+                    _boolMailInvalid = false;
                 }
 
                 return match.Groups[1].Value+domainName;

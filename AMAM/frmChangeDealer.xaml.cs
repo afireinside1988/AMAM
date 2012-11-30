@@ -8,29 +8,31 @@ namespace Amam
     /// <summary>
     /// Interaktionslogik für frmChangeDealer.xaml
     /// </summary>
-    public partial class FrmChangeDealer : Window
+    public partial class FrmChangeDealer
     {
-        string _ID;
+        readonly string _id;
 
-        public FrmChangeDealer(string ID)
+        public FrmChangeDealer(string id)
         {
             InitializeComponent();
 
-            _ID = ID;
+            _id = id;
 
-            SqlConnectionStringBuilder ConnString = new SqlConnectionStringBuilder();
-            ConnString.DataSource = "localhost";
-            ConnString.InitialCatalog = "AMAM";
-            ConnString.IntegratedSecurity = true;
+            var connString = new SqlConnectionStringBuilder
+                {
+                    DataSource = "localhost",
+                    InitialCatalog = "AMAM",
+                    IntegratedSecurity = true
+                };
 
-            using(SqlConnection sqlConn = new SqlConnection(ConnString.ToString()))
+            using(var sqlConn = new SqlConnection(connString.ToString()))
             {
                 try
                 {
                     sqlConn.Open();
-                    SqlCommand ReadRow = new SqlCommand("SELECT Vertrieb, eMail, Kundennummer FROM Dealers WHERE VertriebID = @paramPK", sqlConn);
-                    ReadRow.Parameters.Add(new SqlParameter("@paramPK", ID));
-                    using(SqlDataReader dr = ReadRow.ExecuteReader())
+                    var readRow = new SqlCommand("SELECT Vertrieb, eMail, Kundennummer FROM Dealers WHERE VertriebID = @paramPK", sqlConn);
+                    readRow.Parameters.Add(new SqlParameter("@paramPK", id));
+                    using(SqlDataReader dr = readRow.ExecuteReader())
                     {
                         while(dr.Read())
                         {
@@ -42,14 +44,13 @@ namespace Amam
                 }
                 catch(SqlException ex)
                 {
-                    ExceptionReporter Reporter = new ExceptionReporter(ex);
-                    Reporter.ReportExceptionToAdmin();
+                    var reporter = new ExceptionReporter(ex);
+                    reporter.ReportExceptionToAdmin();
                     MessageBox.Show("Auf die Datenbank konnte nicht zugegriffen werden. Ein Fehlerbericht wurde an den Administrator gesendet.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
                 }
                 finally
                 {
-                    if(sqlConn.State == System.Data.ConnectionState.Open)
+                    if(sqlConn.State == ConnectionState.Open)
                     {
                         sqlConn.Close();
                     }
@@ -60,12 +61,12 @@ namespace Amam
 
         private void Close(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            Close();
         }
 
         private void ChangeDealer(object sender, RoutedEventArgs e)
         {
-            Validator validator = new Validator();
+            var validator = new Validator();
 
             tbDealer.Background = Brushes.White;
             tbDealer.Foreground = Brushes.Black;
@@ -76,34 +77,36 @@ namespace Amam
 
             if(tbDealer.Text.Length > 0 && validator.IsMailValid(tbMail.Text) && tbCustomerID.Text.Length > 0)
             {
-                SqlConnectionStringBuilder ConnString = new SqlConnectionStringBuilder();
-                ConnString.DataSource = "localhost";
-                ConnString.InitialCatalog = "AMAM";
-                ConnString.IntegratedSecurity = true;
+                var connString = new SqlConnectionStringBuilder
+                    {
+                        DataSource = "localhost",
+                        InitialCatalog = "AMAM",
+                        IntegratedSecurity = true
+                    };
 
-                using(SqlConnection sqlConn = new SqlConnection(ConnString.ToString()))
+                using(var sqlConn = new SqlConnection(connString.ToString()))
                 {
                     try
                     {
                         sqlConn.Open();
-                        SqlCommand changeCommand = new SqlCommand("UPDATE Dealers SET " +
-                                                                    "Vertrieb = @paramVertrieb, " +
-                                                                    "eMail = @paramMail, " +
-                                                                    "Kundennummer = @paramCustomerID " +
-                                                                    "WHERE VertriebID = @paramPK", sqlConn);
+                        var changeCommand = new SqlCommand("UPDATE Dealers SET " +
+                                                           "Vertrieb = @paramVertrieb, " +
+                                                           "eMail = @paramMail, " +
+                                                           "Kundennummer = @paramCustomerID " +
+                                                           "WHERE VertriebID = @paramPK", sqlConn);
                         
                         changeCommand.Parameters.Add(new SqlParameter("@paramVertrieb", tbDealer.Text));
                         changeCommand.Parameters.Add(new SqlParameter("@paramMail", tbMail.Text));
                         changeCommand.Parameters.Add(new SqlParameter("@paramCustomerID", tbCustomerID.Text));
-                        changeCommand.Parameters.Add(new SqlParameter("@paramPK", _ID));
+                        changeCommand.Parameters.Add(new SqlParameter("@paramPK", _id));
 
                         changeCommand.ExecuteNonQuery();
-                        this.Close();
+                        Close();
                     }
                     catch(SqlException ex)
                     {
-                        ExceptionReporter Reporter = new ExceptionReporter(ex);
-                        Reporter.ReportExceptionToAdmin();
+                        var reporter = new ExceptionReporter(ex);
+                        reporter.ReportExceptionToAdmin();
                         MessageBox.Show("Auf die Datenbank konnte nicht zugegriffen werden. Ein Fehlerbericht wurde an den Administrator gesendet.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
                         return;
                     }

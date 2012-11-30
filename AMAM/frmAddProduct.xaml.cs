@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Windows;
-using System.Windows.Documents;
 using System.Windows.Media;
 
 namespace Amam
@@ -11,53 +9,53 @@ namespace Amam
 	/// <summary>
 	/// Interaktionslogik für frmAddProduct.xaml
 	/// </summary>
-	public partial class FrmAddProduct : Window
+	public partial class FrmAddProduct
 	{
-
-		DataTable ProductDataTable = new DataTable();
-
+	    readonly DataTable _productDataTable = new DataTable();
 
 		public FrmAddProduct()
 		{
 			InitializeComponent();
 
-			ProductDataTable.Columns.Add(new DataColumn("VertriebID"));
-			ProductDataTable.Columns.Add(new DataColumn("Artikelnummer"));
-			ProductDataTable.Columns.Add(new DataColumn("Preis"));
-			ProductDataTable.Columns.Add(new DataColumn("Verpackungseinheit"));
+			_productDataTable.Columns.Add(new DataColumn("VertriebID"));
+			_productDataTable.Columns.Add(new DataColumn("Artikelnummer"));
+			_productDataTable.Columns.Add(new DataColumn("Preis"));
+			_productDataTable.Columns.Add(new DataColumn("Verpackungseinheit"));
 
-			dgProductData.DataContext = ProductDataTable.DefaultView;
-			ProductDataTable.PrimaryKey = new DataColumn[] {ProductDataTable.Columns["Artikelnummer"]};
+			dgProductData.DataContext = _productDataTable.DefaultView;
+			_productDataTable.PrimaryKey = new[] {_productDataTable.Columns["Artikelnummer"]};
 			dgProductData.SelectedValuePath = "Artikelnummer";
 
 			ReadDealers();
 
 			#region Tabellenexistenz sicherstellen
 
-			SqlConnectionStringBuilder ConnString = new SqlConnectionStringBuilder();
-			ConnString.DataSource = "localhost";
-			ConnString.InitialCatalog = "AMAM";
-			ConnString.IntegratedSecurity = true;
+			var connString = new SqlConnectionStringBuilder
+			    {
+			        DataSource = "localhost",
+			        InitialCatalog = "AMAM",
+			        IntegratedSecurity = true
+			    };
 
-			using(SqlConnection sqlConn = new SqlConnection(ConnString.ToString()))
+		    using(var sqlConn = new SqlConnection(connString.ToString()))
 			{
 				try
 				{
 					sqlConn.Open();
 
-					if(!sqlhelper.TableExists(sqlConn, "ProductNames"))
+					if(!Sqlhelper.TableExists(sqlConn, "ProductNames"))
 					{
-						SqlCommand newTable = new SqlCommand("CREATE TABLE ProductNames (Produktnummer int IDENTITY(1,1) PRIMARY KEY, " + 
+						var newTable = new SqlCommand("CREATE TABLE ProductNames (Produktnummer int IDENTITY(1,1) PRIMARY KEY, " + 
 																"Produktname nvarchar(255) NOT NULL)", sqlConn);
 						newTable.ExecuteNonQuery();
 					}
-					if(!sqlhelper.TableExists(sqlConn, "Units"))
+					if(!Sqlhelper.TableExists(sqlConn, "Units"))
 					{
-						SqlCommand newTable = new SqlCommand("CREATE TABLE Units (EinheitID int IDENTITY(1,1) CONSTRAINT pkEinheitID PRIMARY KEY, " +
+						var newTable = new SqlCommand("CREATE TABLE Units (EinheitID int IDENTITY(1,1) CONSTRAINT pkEinheitID PRIMARY KEY, " +
 																"Einheit nvarchar(128) NOT NULL)", sqlConn);
 						newTable.ExecuteNonQuery();
 
-						SqlCommand newRow = new SqlCommand("INSERT INTO Units (Einheit) VALUES(@paramEinheit1), (@paramEinheit2), (@paramEinheit3)", sqlConn);
+						var newRow = new SqlCommand("INSERT INTO Units (Einheit) VALUES(@paramEinheit1), (@paramEinheit2), (@paramEinheit3)", sqlConn);
 						newRow.Parameters.Add(new SqlParameter("@paramEinheit1", "Stück"));
 						newRow.Parameters.Add(new SqlParameter("@paramEinheit2", "Packung"));
 						newRow.Parameters.Add(new SqlParameter("@paramEinheit3", "Originalpackung"));
@@ -65,9 +63,9 @@ namespace Amam
 						newRow.ExecuteNonQuery();
 					}
 
-					if(!sqlhelper.TableExists(sqlConn, "ProductData"))
+					if(!Sqlhelper.TableExists(sqlConn, "ProductData"))
 					{
-						SqlCommand newTable = new SqlCommand("CREATE TABLE ProductData (ProduktID int IDENTITY(1,1) CONSTRAINT pkProduktID PRIMARY KEY, " +
+						var newTable = new SqlCommand("CREATE TABLE ProductData (ProduktID int IDENTITY(1,1) CONSTRAINT pkProduktID PRIMARY KEY, " +
 																"Produktnummer int NOT NULL CONSTRAINT fkProduktnummer FOREIGN KEY REFERENCES ProductNames(Produktnummer), " +
 																"Artikelnummer nvarchar(255) NOT NULL, " +
 																"VertriebID int NOT NULL CONSTRAINT fkVertriebID FOREIGN KEY REFERENCES Dealers(VertriebID), " +
@@ -80,8 +78,8 @@ namespace Amam
 				}
 				catch(SqlException ex)
 				{
-					ExceptionReporter Reporter = new ExceptionReporter(ex);
-					Reporter.ReportExceptionToAdmin();
+					var reporter = new ExceptionReporter(ex);
+					reporter.ReportExceptionToAdmin();
 					MessageBox.Show("Auf die Datenbank konnte nicht zugegriffen werden. Ein Fehlerbericht wurde an den Administrator gesendet.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
 				}
 				finally
@@ -103,58 +101,58 @@ namespace Amam
 			
 			cboDealers.Items.Clear();
 
-			SqlConnectionStringBuilder ConnString = new SqlConnectionStringBuilder();
-			ConnString.DataSource = "localhost";
-			ConnString.InitialCatalog = "AMAM";
-			ConnString.IntegratedSecurity = true;
+			var connString = new SqlConnectionStringBuilder
+			    {
+			        DataSource = "localhost",
+			        InitialCatalog = "AMAM",
+			        IntegratedSecurity = true
+			    };
 
-			using(SqlConnection sqlConn = new SqlConnection(ConnString.ToString()))
+		    using(var sqlConn = new SqlConnection(connString.ToString()))
 			{
 				try
 				{
 					sqlConn.Open();
 
-					if(sqlhelper.TableExists(sqlConn, "Dealers"))
+					if(Sqlhelper.TableExists(sqlConn, "Dealers"))
 					{
-						DataTable DealerTable = new DataTable();
-						SqlDataAdapter dataAdapter = new SqlDataAdapter("SELECT VertriebID, Vertrieb FROM Dealers", sqlConn);
-						SqlCommandBuilder sqlCommand = new SqlCommandBuilder(dataAdapter);
-						DealerTable.Clear();
-						dataAdapter.Fill(DealerTable);
+						var dealerTable = new DataTable();
+						var dataAdapter = new SqlDataAdapter("SELECT VertriebID, Vertrieb FROM Dealers", sqlConn);
+						dealerTable.Clear();
+						dataAdapter.Fill(dealerTable);
 
-						cboDealers.ItemsSource = DealerTable.DefaultView;
+						cboDealers.ItemsSource = dealerTable.DefaultView;
 						cboDealers.DisplayMemberPath = "Vertrieb";
 						cboDealers.SelectedValuePath = "VertriebID";
 						cboDealers.SelectedIndex = 0;
 
 						if(cboDealers.Items.Count == 0)
 						{
-							MessageBoxResult Answer = MessageBox.Show("Es wurden keine Vertriebe gefunden. Möchten Sie jetzt einen neuen Vertrieb hinzufügen?", "Fehler", MessageBoxButton.YesNo, MessageBoxImage.Question);
-							if(Answer == MessageBoxResult.Yes)
+							MessageBoxResult answer = MessageBox.Show("Es wurden keine Vertriebe gefunden. Möchten Sie jetzt einen neuen Vertrieb hinzufügen?", "Fehler", MessageBoxButton.YesNo, MessageBoxImage.Question);
+							if(answer == MessageBoxResult.Yes)
 							{
-								FrmDealersList DealerManager = new FrmDealersList();
-								DealerManager.ShowDialog();
+								var dealerManager = new FrmDealersList();
+								dealerManager.ShowDialog();
 								ReadDealers();
 							}
 						}
 					}
 					else
 					{
-						MessageBoxResult Answer = MessageBox.Show("Es wurden keine Vertriebe gefunden. Möchten Sie jetzt einen neuen Vertrieb hinzufügen?", "Fehler", MessageBoxButton.YesNo, MessageBoxImage.Question);
-						if(Answer == MessageBoxResult.Yes)
+						MessageBoxResult answer = MessageBox.Show("Es wurden keine Vertriebe gefunden. Möchten Sie jetzt einen neuen Vertrieb hinzufügen?", "Fehler", MessageBoxButton.YesNo, MessageBoxImage.Question);
+						if(answer == MessageBoxResult.Yes)
 						{
-							FrmDealersList DealerManager = new FrmDealersList();
-							DealerManager.ShowDialog();
+							var dealerManager = new FrmDealersList();
+							dealerManager.ShowDialog();
 							ReadDealers();
 						}
 					}
 				}
 				catch(SqlException ex)
 				{
-					ExceptionReporter Reporter = new ExceptionReporter(ex);
-					Reporter.ReportExceptionToAdmin();
+					var reporter = new ExceptionReporter(ex);
+					reporter.ReportExceptionToAdmin();
 					MessageBox.Show("Auf die Datenbank konnte nicht zugegriffen werden. Ein Fehlerbericht wurde an den Administrator gesendet.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
-					return;
 				}
 				finally
 				{
@@ -171,58 +169,58 @@ namespace Amam
 
 			cboPackageMass.Items.Clear();
 
-			SqlConnectionStringBuilder ConnString = new SqlConnectionStringBuilder();
-			ConnString.DataSource = "localhost";
-			ConnString.InitialCatalog = "AMAM";
-			ConnString.IntegratedSecurity = true;
+			var connString = new SqlConnectionStringBuilder
+			    {
+			        DataSource = "localhost",
+			        InitialCatalog = "AMAM",
+			        IntegratedSecurity = true
+			    };
 
-			using(SqlConnection sqlConn = new SqlConnection(ConnString.ToString()))
+		    using(var sqlConn = new SqlConnection(connString.ToString()))
 			{
 				try
 				{
 					sqlConn.Open();
 
-					if(sqlhelper.TableExists(sqlConn, "Units"))
+					if(Sqlhelper.TableExists(sqlConn, "Units"))
 					{
-						DataTable DealerTable = new DataTable();
-						SqlDataAdapter dataAdapter = new SqlDataAdapter("SELECT EinheitID, Einheit FROM Units", sqlConn);
-						SqlCommandBuilder sqlCommand = new SqlCommandBuilder(dataAdapter);
-						DealerTable.Clear();
-						dataAdapter.Fill(DealerTable);
+						var dealerTable = new DataTable();
+						var dataAdapter = new SqlDataAdapter("SELECT EinheitID, Einheit FROM Units", sqlConn);
+						dealerTable.Clear();
+						dataAdapter.Fill(dealerTable);
 
-						cboPackageMass.ItemsSource = DealerTable.DefaultView;
+						cboPackageMass.ItemsSource = dealerTable.DefaultView;
 						cboPackageMass.DisplayMemberPath = "Einheit";
 						cboPackageMass.SelectedValuePath = "Einheit";
 						cboPackageMass.SelectedIndex = 0;
 
 						if(cboDealers.Items.Count == 0)
 						{
-							MessageBoxResult Answer = MessageBox.Show("Es wurden keine Verpackungseinheiten gefunden. Möchten Sie jetzt eine neue Verpackungseinheit hinzufügen?", "Fehler", MessageBoxButton.YesNo, MessageBoxImage.Question);
-							if(Answer == MessageBoxResult.Yes)
+							MessageBoxResult answer = MessageBox.Show("Es wurden keine Verpackungseinheiten gefunden. Möchten Sie jetzt eine neue Verpackungseinheit hinzufügen?", "Fehler", MessageBoxButton.YesNo, MessageBoxImage.Question);
+							if(answer == MessageBoxResult.Yes)
 							{
-								FrmDealersList DealerManager = new FrmDealersList();
-								DealerManager.ShowDialog();
+								var dealerManager = new FrmDealersList();
+								dealerManager.ShowDialog();
 								ReadDealers();
 							}
 						}
 					}
 					else
 					{
-						MessageBoxResult Answer = MessageBox.Show("Es wurden keine Verpackungseinheiten gefunden. Möchten Sie jetzt eine neue Verpackungseinheit hinzufügen?", "Fehler", MessageBoxButton.YesNo, MessageBoxImage.Question);
-						if(Answer == MessageBoxResult.Yes)
+						MessageBoxResult answer = MessageBox.Show("Es wurden keine Verpackungseinheiten gefunden. Möchten Sie jetzt eine neue Verpackungseinheit hinzufügen?", "Fehler", MessageBoxButton.YesNo, MessageBoxImage.Question);
+						if(answer == MessageBoxResult.Yes)
 						{
-							FrmDealersList DealerManager = new FrmDealersList();
-							DealerManager.ShowDialog();
+							var dealerManager = new FrmDealersList();
+							dealerManager.ShowDialog();
 							ReadDealers();
 						}
 					}
 				}
 				catch(SqlException ex)
 				{
-					ExceptionReporter Reporter = new ExceptionReporter(ex);
-					Reporter.ReportExceptionToAdmin();
+					var reporter = new ExceptionReporter(ex);
+					reporter.ReportExceptionToAdmin();
 					MessageBox.Show("Auf die Datenbank konnte nicht zugegriffen werden. Ein Fehlerbericht wurde an den Administrator gesendet.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
-					return;
 				}
 				finally
 				{
@@ -241,25 +239,27 @@ namespace Amam
 
 			if(tbProductName.Text.Length > 0)
 			{
-				SqlConnectionStringBuilder ConnString = new SqlConnectionStringBuilder();
-				ConnString.DataSource = "localhost";
-				ConnString.InitialCatalog = "AMAM";
-				ConnString.IntegratedSecurity = true;
+				var connString = new SqlConnectionStringBuilder
+				    {
+				        DataSource = "localhost",
+				        InitialCatalog = "AMAM",
+				        IntegratedSecurity = true
+				    };
 
-				using(SqlConnection sqlConn = new SqlConnection(ConnString.ToString()))
+			    using(var sqlConn = new SqlConnection(connString.ToString()))
 				{
 					try
 					{
 						sqlConn.Open();
 
-						SqlCommand newRow = new SqlCommand("INSERT INTO ProductNames (Produktname) VALUES(@paramName)", sqlConn);
+						var newRow = new SqlCommand("INSERT INTO ProductNames (Produktname) VALUES(@paramName)", sqlConn);
 						newRow.Parameters.Add(new SqlParameter("@paramName", tbProductName.Text));
 						newRow.ExecuteNonQuery();
 					}
 					catch(SqlException ex)
 					{
-						ExceptionReporter Reporter = new ExceptionReporter(ex);
-						Reporter.ReportExceptionToAdmin();
+						var reporter = new ExceptionReporter(ex);
+						reporter.ReportExceptionToAdmin();
 						MessageBox.Show("Auf die Datenbank konnte nicht zugegriffen werden. Ein Fehlerbericht wurde an den Administrator gesendet.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
 					}
 					finally
@@ -281,25 +281,27 @@ namespace Amam
 
 		private void AddProductDataToDataBase()
 		{
-			SqlConnectionStringBuilder ConnString = new SqlConnectionStringBuilder();
-			ConnString.DataSource = "localhost";
-			ConnString.InitialCatalog = "AMAM";
-			ConnString.IntegratedSecurity = true;
+			var connString = new SqlConnectionStringBuilder
+			    {
+			        DataSource = "localhost",
+			        InitialCatalog = "AMAM",
+			        IntegratedSecurity = true
+			    };
 
-			using(SqlConnection sqlConn = new SqlConnection(ConnString.ToString()))
+		    using(var sqlConn = new SqlConnection(connString.ToString()))
 			{
 				try
 				{
 					sqlConn.Open();
 
-					SqlCommand newRow = new SqlCommand("INSERT INTO ProductData (Produktnummer, Artikelnummer, VertriebID, Preis, EinheitID) " +
+					var newRow = new SqlCommand("INSERT INTO ProductData (Produktnummer, Artikelnummer, VertriebID, Preis, EinheitID) " +
 														"VALUES((SELECT Produktnummer FROM ProductNames WHERE ProductNames.Produktname = @paramName), " +
 														"@paramArtikelnummer, " + 
 														"(SELECT VertriebID FROM Dealers WHERE Dealers.VertriebID = @paramVertriebID), " + 
 														"@paramPreis, "+
 														"(SELECT EinheitID FROM Units WHERE Units.Einheit = @paramEinheit))", sqlConn);
 
-					foreach(DataRow row in ProductDataTable.Rows)
+					foreach(DataRow row in _productDataTable.Rows)
 					{
 						newRow.Parameters.Add(new SqlParameter("@paramName", tbProductName.Text));
 						newRow.Parameters.Add(new SqlParameter("@paramArtikelnummer", row["Artikelnummer"]));
@@ -313,8 +315,8 @@ namespace Amam
 				}
 				catch(SqlException ex)
 				{
-					ExceptionReporter Reporter = new ExceptionReporter(ex);
-					Reporter.ReportExceptionToAdmin();
+					var reporter = new ExceptionReporter(ex);
+					reporter.ReportExceptionToAdmin();
 					MessageBox.Show("Auf die Datenbank konnte nicht zugegriffen werden. Ein Fehlerbericht wurde an den Administrator gesendet.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
 				}
 				finally
@@ -337,13 +339,13 @@ namespace Amam
 
 					try
 					{
-						DataRow newDataRow = ProductDataTable.NewRow();
+						DataRow newDataRow = _productDataTable.NewRow();
 						newDataRow["VertriebID"] = cboDealers.SelectedValue;
 						newDataRow["Artikelnummer"] = tbArticelNumber.Text;
 						newDataRow["Preis"] = tbPrice.Text;
 						newDataRow["Verpackungseinheit"] = cboPackageMass.SelectedValue;
 
-						ProductDataTable.Rows.Add(newDataRow);
+						_productDataTable.Rows.Add(newDataRow);
 					}
 					catch(ConstraintException)
 					{
@@ -359,14 +361,14 @@ namespace Amam
 
 		private void Close(object sender, RoutedEventArgs e)
 		{
-			this.Close();
+			Close();
 		}
 
 		private void SaveProduct(object sender, RoutedEventArgs e)
 		{
 			AddProductNameToDataBase();
 			AddProductDataToDataBase();
-			this.Close();
+			Close();
 		}
 
 	}

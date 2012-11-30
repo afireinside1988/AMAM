@@ -2,7 +2,6 @@
 using System.Net;
 using System.Net.Mail;
 using System.Windows;
-using System.Runtime.Serialization;
 
 namespace Amam
 {
@@ -52,17 +51,17 @@ namespace Amam
     /// </summary>
     public class ExceptionReporter
     {
-        private string _ExceptionMessage;
-        private string _ReportingApplication;
-        private string _ReportingMachine;
+        private readonly string _exceptionMessage;
+        private readonly string _reportingApplication;
+        private readonly string _reportingMachine;
 
         public ExceptionReporter(Exception ex)
         {
             if(ex != null)
             {
-            _ExceptionMessage = ex.Message;
-            _ReportingApplication = ex.Source + " in " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Name;
-            _ReportingMachine = Environment.MachineName;
+            _exceptionMessage = ex.Message;
+            _reportingApplication = ex.Source + " in " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Name;
+            _reportingMachine = Environment.MachineName;
             }
         }
 
@@ -72,13 +71,15 @@ namespace Amam
         /// <param name="attachmentPath">Optional kann eine Datei an die eMail angehangen werden</param>
         public void ReportExceptionToAdmin(string attachmentPath)
         {
-            string Admin = Amam.Properties.Resources.AdminMail;
-            MailMessage Mail = new MailMessage(Amam.Properties.Resources.HostMailAdress, Admin);
-            Mail.Subject = _ReportingApplication + " auf " + _ReportingMachine + " hat einen Fehler verursacht";
-            Mail.Body = _ExceptionMessage;
-            if(!(attachmentPath == null))
+            string admin = Properties.Resources.AdminMail;
+            var mail = new MailMessage(Properties.Resources.HostMailAdress, admin)
+                {
+                    Subject = _reportingApplication + " auf " + _reportingMachine + " hat einen Fehler verursacht",
+                    Body = _exceptionMessage
+                };
+            if(attachmentPath != null)
             {
-                Mail.Attachments.Add(new Attachment(attachmentPath));
+                mail.Attachments.Add(new Attachment(attachmentPath));
                 MessageBox.Show("Es konnte keine Datei an die eMail angefügt werden. Die eMail wird ohne Anhang versendet.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -88,19 +89,20 @@ namespace Amam
         /// </summary>
         public void ReportExceptionToAdmin()
         {
-			Validator Validate = new Validator();
-			if(Validate.IsMailValid(Amam.Properties.Resources.AdminMail) & Validate.IsMailValid(Amam.Properties.Resources.HostMailAdress))
+			var validate = new Validator();
+			if(validate.IsMailValid(Properties.Resources.AdminMail) & validate.IsMailValid(Properties.Resources.HostMailAdress))
 			{
-				string Admin = Amam.Properties.Resources.AdminMail;
-				MailMessage Mail = new MailMessage(Amam.Properties.Resources.HostMailAdress, Admin);
-				Mail.Subject = _ReportingApplication + " auf " + _ReportingMachine + " hat einen Fehler verursacht";
-				Mail.Body = _ExceptionMessage;
+				string admin = Properties.Resources.AdminMail;
+				var mail = new MailMessage(Properties.Resources.HostMailAdress, admin)
+				    {
+				        Subject = _reportingApplication + " auf " + _reportingMachine + " hat einen Fehler verursacht",
+				        Body = _exceptionMessage
+				    };
 
-				SmtpClient client = new SmtpClient();
-				client.Host = Amam.Properties.Resources.Host;
-				NetworkCredential AuthenticationCredentials = new NetworkCredential(Amam.Properties.Resources.HostMailAdress, Amam.Properties.Resources.HostMailPassword);
-				client.Credentials = AuthenticationCredentials;
-				client.Send(Mail);
+			    var client = new SmtpClient {Host = Properties.Resources.Host};
+			    var authenticationCredentials = new NetworkCredential(Properties.Resources.HostMailAdress, Properties.Resources.HostMailPassword);
+				client.Credentials = authenticationCredentials;
+				client.Send(mail);
 			}
         }
     }
