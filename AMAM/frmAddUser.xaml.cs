@@ -25,48 +25,48 @@ namespace Amam
         /// <param name="e"></param>
         private void AddUser(object sender, RoutedEventArgs e)
         {
-                tbUsername.Background = Brushes.White;
-                tbUsername.Foreground = Brushes.Black;
-                tbPassword.Background = Brushes.White;
-                tbPassword.Foreground = Brushes.Black;
+                TbUsername.Background = Brushes.White;
+                TbUsername.Foreground = Brushes.Black;
+                TbPassword.Background = Brushes.White;
+                TbPassword.Foreground = Brushes.Black;
 
                 var usr = new UserList(_ds);
 
-				if(tbPassword.Password == tbPasswordConfirm.Password)
+				if(TbPassword.Password == TbPasswordConfirm.Password)
 				{
 					try
 					{
-						usr.CreateUser(tbUsername.Text, tbPassword.Password);
+						usr.CreateUser(TbUsername.Text, TbPassword.Password);
 						Close();
 					}
 					catch(UserNameIsNullOrEmptyException ex)
 					{
 						MessageBox.Show(ex.Message, "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
-						tbUsername.Background = Brushes.Red;
-						tbUsername.Foreground = Brushes.White;
-						tbUsername.Focus();
+						TbUsername.Background = Brushes.Red;
+						TbUsername.Foreground = Brushes.White;
+						TbUsername.Focus();
 					}
 					catch(PasswordIsNullOrEmptyException ex)
 					{
 						MessageBox.Show(ex.Message, "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
-						tbPassword.Background = Brushes.Red;
-						tbPassword.Foreground = Brushes.White;
-						tbPassword.Focus();
+						TbPassword.Background = Brushes.Red;
+						TbPassword.Foreground = Brushes.White;
+						TbPassword.Focus();
 					}
 					catch(ArgumentException ex)
 					{
 						MessageBox.Show(ex.Message, "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
-						tbUsername.Background = Brushes.Red;
-						tbUsername.Foreground = Brushes.White;
-						tbUsername.Focus();
+						TbUsername.Background = Brushes.Red;
+						TbUsername.Foreground = Brushes.White;
+						TbUsername.Focus();
 					}
 				}
 				else
 				{
 					MessageBox.Show("Das Passwort stimmt nicht mit der Passwortbestätigung überein.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
-					tbPassword.Password = null;
-					tbPasswordConfirm.Password = null;
-					tbPassword.Focus();
+					TbPassword.Password = null;
+					TbPasswordConfirm.Password = null;
+					TbPassword.Focus();
 				}
         }
 

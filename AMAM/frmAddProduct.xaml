@@ -11,7 +11,7 @@
         <DockPanel LastChildFill="True">
             <DockPanel DockPanel.Dock="Top">
                 <Label Content="Produktname:" Padding="0" Margin="5" DockPanel.Dock="Left"/>
-                <TextBox x:Name="tbProductName" Margin="5" DockPanel.Dock="Right" MaxLength="255" ></TextBox>
+                <TextBox x:Name="TbProductName" Margin="5" DockPanel.Dock="Right" MaxLength="255" ></TextBox>
             </DockPanel>
             <GroupBox Margin="5" Header="Datensätze" DockPanel.Dock="Bottom">
                 <DockPanel>
@@ -19,19 +19,19 @@
                     <DockPanel LastChildFill="True">
                             <DockPanel DockPanel.Dock="Top">
                                 <Label Content="Vertrieb:" Margin="5" Padding="0" DockPanel.Dock="Left" VerticalContentAlignment="Center"/>
-                                <ComboBox x:Name="cboDealers" Margin="5" HorizontalAlignment="Left" MinWidth="100" DockPanel.Dock="Left" ItemsSource="{Binding}"></ComboBox>
+                                <ComboBox x:Name="CboDealers" Margin="5" HorizontalAlignment="Left" MinWidth="100" DockPanel.Dock="Left" ItemsSource="{Binding}"></ComboBox>
                                 <Label Content="Artikelnummer:" Padding="0" Margin="5" VerticalContentAlignment="Center" DockPanel.Dock="Left"/>
-                                <ComboBox x:Name="cboPackageMass" Margin="5" MinWidth="50" DockPanel.Dock="Right" ItemsSource="{Binding}"></ComboBox>
+                                <ComboBox x:Name="CboPackageMass" Margin="5" MinWidth="50" DockPanel.Dock="Right" ItemsSource="{Binding}"></ComboBox>
                                 <Label Content="Verkaufseinheit:" Padding="0" Margin="5" VerticalContentAlignment="Center" DockPanel.Dock="Right"/>
-                                <TextBox x:Name="tbPrice" Margin="5" DockPanel.Dock="Right" MinWidth="50" MaxLength="255"></TextBox>
+                                <TextBox x:Name="TbPrice" Margin="5" DockPanel.Dock="Right" MinWidth="50" MaxLength="255"></TextBox>
                                 <Label Content="Preis:" Padding="0" Margin="5" VerticalContentAlignment="Center" DockPanel.Dock="Right"/>
-                                <TextBox x:Name="tbArticelNumber" Margin="5" MaxLength="255" ></TextBox>
+                                <TextBox x:Name="TbArticleNumber" Margin="5" MaxLength="255" ></TextBox>
                             </DockPanel>
                         <StackPanel Height="{Binding ActualHeight, ElementName=listView, Mode=OneWay}" VerticalAlignment="Top" Margin="5">
-                            <Button x:Name="btnAddArticleNumber" Content="+" HorizontalAlignment="Right" Padding="5" Click="AddDataSet"/>
-                            <Button Content="-" HorizontalAlignment="Right" Width="{Binding ActualWidth, ElementName=btnAddArticleNumber, Mode=OneWay}" Padding="5"/>
+                            <Button x:Name="BtnAddArticleNumber" Content="+" HorizontalAlignment="Right" Padding="5" Click="AddDataSet"/>
+                            <Button Content="-" HorizontalAlignment="Right" Width="{Binding ActualWidth, ElementName=BtnAddArticleNumber, Mode=OneWay}" Padding="5"/>
                         </StackPanel>
-                        <DataGrid Margin="5" MinHeight="70" IsReadOnly="True" CanUserSortColumns="False" x:Name="dgProductData" ItemsSource="{Binding}"/>
+                        <DataGrid Margin="5" MinHeight="70" IsReadOnly="True" CanUserSortColumns="False" x:Name="DgProductData" ItemsSource="{Binding}"/>
                         
                     </DockPanel>
                 </DockPanel>

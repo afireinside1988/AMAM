@@ -22,69 +22,72 @@ namespace Amam
 			_productDataTable.Columns.Add(new DataColumn("Preis"));
 			_productDataTable.Columns.Add(new DataColumn("Verpackungseinheit"));
 
-			dgProductData.DataContext = _productDataTable.DefaultView;
+			DgProductData.DataContext = _productDataTable.DefaultView;
 			_productDataTable.PrimaryKey = new[] {_productDataTable.Columns["Artikelnummer"]};
-			dgProductData.SelectedValuePath = "Artikelnummer";
+			DgProductData.SelectedValuePath = "Artikelnummer";
 
 			ReadDealers();
 
 			#region Tabellenexistenz sicherstellen
 
 			var connString = new SqlConnectionStringBuilder
-			    {
-			        DataSource = "localhost",
-			        InitialCatalog = "AMAM",
-			        IntegratedSecurity = true
-			    };
+				{
+					DataSource = "localhost",
+					InitialCatalog = "AMAM",
+					IntegratedSecurity = true
+				};
 
-		    using(var sqlConn = new SqlConnection(connString.ToString()))
+			using (var sqlConn = new SqlConnection(connString.ToString()))
 			{
 				try
 				{
 					sqlConn.Open();
 
-					if(!Sqlhelper.TableExists(sqlConn, "ProductNames"))
+					if (!Sqlhelper.TableExists(sqlConn, "ProductNames"))
 					{
-						var newTable = new SqlCommand("CREATE TABLE ProductNames (Produktnummer int IDENTITY(1,1) PRIMARY KEY, " + 
-																"Produktname nvarchar(255) NOT NULL)", sqlConn);
+						var newTable = new SqlCommand("CREATE TABLE ProductNames (Produktnummer int IDENTITY(1,1) PRIMARY KEY, " +
+						                              "Produktname nvarchar(255) NOT NULL)", sqlConn);
 						newTable.ExecuteNonQuery();
 					}
-					if(!Sqlhelper.TableExists(sqlConn, "Units"))
+					if (!Sqlhelper.TableExists(sqlConn, "Units"))
 					{
-						var newTable = new SqlCommand("CREATE TABLE Units (EinheitID int IDENTITY(1,1) CONSTRAINT pkEinheitID PRIMARY KEY, " +
-																"Einheit nvarchar(128) NOT NULL)", sqlConn);
+						var newTable =
+							new SqlCommand("CREATE TABLE Units (EinheitID int IDENTITY(1,1) CONSTRAINT pkEinheitID PRIMARY KEY, " +
+							               "Einheit nvarchar(128) NOT NULL)", sqlConn);
 						newTable.ExecuteNonQuery();
 
-						var newRow = new SqlCommand("INSERT INTO Units (Einheit) VALUES(@paramEinheit1), (@paramEinheit2), (@paramEinheit3)", sqlConn);
+						var newRow =
+							new SqlCommand("INSERT INTO Units (Einheit) VALUES(@paramEinheit1), (@paramEinheit2), (@paramEinheit3)", sqlConn);
 						newRow.Parameters.Add(new SqlParameter("@paramEinheit1", "Stück"));
 						newRow.Parameters.Add(new SqlParameter("@paramEinheit2", "Packung"));
 						newRow.Parameters.Add(new SqlParameter("@paramEinheit3", "Originalpackung"));
-						
+
 						newRow.ExecuteNonQuery();
 					}
 
-					if(!Sqlhelper.TableExists(sqlConn, "ProductData"))
+					if (!Sqlhelper.TableExists(sqlConn, "ProductData"))
 					{
-						var newTable = new SqlCommand("CREATE TABLE ProductData (ProduktID int IDENTITY(1,1) CONSTRAINT pkProduktID PRIMARY KEY, " +
-																"Produktnummer int NOT NULL CONSTRAINT fkProduktnummer FOREIGN KEY REFERENCES ProductNames(Produktnummer), " +
-																"Artikelnummer nvarchar(255) NOT NULL, " +
-																"VertriebID int NOT NULL CONSTRAINT fkVertriebID FOREIGN KEY REFERENCES Dealers(VertriebID), " +
-																"Preis nvarchar(128) NOT NULL, " +
-																"EinheitID int NOT NULL CONSTRAINT fkEinheitID FOREIGN KEY REFERENCES Units(EinheitID))", sqlConn);
+						var newTable =
+							new SqlCommand("CREATE TABLE ProductData (ProduktID int IDENTITY(1,1) CONSTRAINT pkProduktID PRIMARY KEY, " +
+							               "Produktnummer int NOT NULL CONSTRAINT fkProduktnummer FOREIGN KEY REFERENCES ProductNames(Produktnummer) ON DELETE CASCADE, " +
+							               "Artikelnummer nvarchar(255) NOT NULL, " +
+							               "VertriebID int NOT NULL CONSTRAINT fkVertriebID FOREIGN KEY REFERENCES Dealers(VertriebID) ON DELETE CASCADE, " +
+							               "Preis nvarchar(128) NOT NULL, " +
+							               "EinheitID int NOT NULL CONSTRAINT fkEinheitID FOREIGN KEY REFERENCES Units(EinheitID) ON DELETE CASCADE)", sqlConn);
 						newTable.ExecuteNonQuery();
 					}
-
-					
 				}
-				catch(SqlException ex)
+				catch (SqlException ex)
 				{
 					var reporter = new ExceptionReporter(ex);
 					reporter.ReportExceptionToAdmin();
-					MessageBox.Show("Auf die Datenbank konnte nicht zugegriffen werden. Ein Fehlerbericht wurde an den Administrator gesendet.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
+					MessageBox.Show(
+						"Auf die Datenbank konnte nicht zugegriffen werden. Ein Fehlerbericht wurde an den Administrator gesendet.",
+						"Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
 				}
 				finally
 				{
-					if(sqlConn.State == ConnectionState.Open)
+					if (sqlConn.State == ConnectionState.Open)
 					{
 						sqlConn.Close();
 					}
@@ -99,7 +102,7 @@ namespace Amam
 		private void ReadDealers()
 		{
 			
-			cboDealers.Items.Clear();
+			CboDealers.Items.Clear();
 
 			var connString = new SqlConnectionStringBuilder
 			    {
@@ -121,12 +124,12 @@ namespace Amam
 						dealerTable.Clear();
 						dataAdapter.Fill(dealerTable);
 
-						cboDealers.ItemsSource = dealerTable.DefaultView;
-						cboDealers.DisplayMemberPath = "Vertrieb";
-						cboDealers.SelectedValuePath = "VertriebID";
-						cboDealers.SelectedIndex = 0;
+						CboDealers.ItemsSource = dealerTable.DefaultView;
+						CboDealers.DisplayMemberPath = "Vertrieb";
+						CboDealers.SelectedValuePath = "VertriebID";
+						CboDealers.SelectedIndex = 0;
 
-						if(cboDealers.Items.Count == 0)
+						if(CboDealers.Items.Count == 0)
 						{
 							MessageBoxResult answer = MessageBox.Show("Es wurden keine Vertriebe gefunden. Möchten Sie jetzt einen neuen Vertrieb hinzufügen?", "Fehler", MessageBoxButton.YesNo, MessageBoxImage.Question);
 							if(answer == MessageBoxResult.Yes)
@@ -167,7 +170,7 @@ namespace Amam
 		private void ReadUnits()
 		{
 
-			cboPackageMass.Items.Clear();
+			CboPackageMass.Items.Clear();
 
 			var connString = new SqlConnectionStringBuilder
 			    {
@@ -189,12 +192,12 @@ namespace Amam
 						dealerTable.Clear();
 						dataAdapter.Fill(dealerTable);
 
-						cboPackageMass.ItemsSource = dealerTable.DefaultView;
-						cboPackageMass.DisplayMemberPath = "Einheit";
-						cboPackageMass.SelectedValuePath = "Einheit";
-						cboPackageMass.SelectedIndex = 0;
+						CboPackageMass.ItemsSource = dealerTable.DefaultView;
+						CboPackageMass.DisplayMemberPath = "Einheit";
+						CboPackageMass.SelectedValuePath = "Einheit";
+						CboPackageMass.SelectedIndex = 0;
 
-						if(cboDealers.Items.Count == 0)
+						if(CboDealers.Items.Count == 0)
 						{
 							MessageBoxResult answer = MessageBox.Show("Es wurden keine Verpackungseinheiten gefunden. Möchten Sie jetzt eine neue Verpackungseinheit hinzufügen?", "Fehler", MessageBoxButton.YesNo, MessageBoxImage.Question);
 							if(answer == MessageBoxResult.Yes)
@@ -234,10 +237,10 @@ namespace Amam
 
 		private void AddProductNameToDataBase()
 		{
-			tbProductName.Background = Brushes.White;
-			tbProductName.Foreground = Brushes.Black;
+			TbProductName.Background = Brushes.White;
+			TbProductName.Foreground = Brushes.Black;
 
-			if(tbProductName.Text.Length > 0)
+			if(TbProductName.Text.Length > 0)
 			{
 				var connString = new SqlConnectionStringBuilder
 				    {
@@ -253,7 +256,7 @@ namespace Amam
 						sqlConn.Open();
 
 						var newRow = new SqlCommand("INSERT INTO ProductNames (Produktname) VALUES(@paramName)", sqlConn);
-						newRow.Parameters.Add(new SqlParameter("@paramName", tbProductName.Text));
+						newRow.Parameters.Add(new SqlParameter("@paramName", TbProductName.Text));
 						newRow.ExecuteNonQuery();
 					}
 					catch(SqlException ex)
@@ -274,8 +277,8 @@ namespace Amam
 			else
 			{
 				MessageBox.Show("Sie müssen einen Produktnamen eingeben.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
-				tbProductName.Background = Brushes.Red;
-				tbProductName.Foreground = Brushes.Black;
+				TbProductName.Background = Brushes.Red;
+				TbProductName.Foreground = Brushes.Black;
 			}
 		}
 
@@ -303,7 +306,7 @@ namespace Amam
 
 					foreach(DataRow row in _productDataTable.Rows)
 					{
-						newRow.Parameters.Add(new SqlParameter("@paramName", tbProductName.Text));
+						newRow.Parameters.Add(new SqlParameter("@paramName", TbProductName.Text));
 						newRow.Parameters.Add(new SqlParameter("@paramArtikelnummer", row["Artikelnummer"]));
 						newRow.Parameters.Add(new SqlParameter("@paramVertriebID", row["VertriebID"]));
 						newRow.Parameters.Add(new SqlParameter("@paramPreis", row["Preis"]));
@@ -331,25 +334,25 @@ namespace Amam
 
 		private void AddDataSet(object sender, RoutedEventArgs e)
 		{
-			if(tbArticelNumber.Text.Length > 0)
+			if(TbArticleNumber.Text.Length > 0)
 			{
 				try
 				{
-					tbPrice.Text = Validator.FormatPrice(tbPrice.Text);
+					TbPrice.Text = Validator.FormatPrice(TbPrice.Text);
 
 					try
 					{
 						DataRow newDataRow = _productDataTable.NewRow();
-						newDataRow["VertriebID"] = cboDealers.SelectedValue;
-						newDataRow["Artikelnummer"] = tbArticelNumber.Text;
-						newDataRow["Preis"] = tbPrice.Text;
-						newDataRow["Verpackungseinheit"] = cboPackageMass.SelectedValue;
+						newDataRow["VertriebID"] = CboDealers.SelectedValue;
+						newDataRow["Artikelnummer"] = TbArticleNumber.Text;
+						newDataRow["Preis"] = TbPrice.Text;
+						newDataRow["Verpackungseinheit"] = CboPackageMass.SelectedValue;
 
 						_productDataTable.Rows.Add(newDataRow);
 					}
 					catch(ConstraintException)
 					{
-						MessageBox.Show("Ein Datensatz für die Artikelnummer " + tbArticelNumber.Text + " existiert bereits.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
+						MessageBox.Show("Ein Datensatz für die Artikelnummer " + TbArticleNumber.Text + " existiert bereits.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
 					}
 				}
 				catch(ArgumentException ex)

@@ -29,7 +29,7 @@ namespace Amam
 				{
 					_ds.ReadXml(xmlFile);
 					xmlFile.Close();
-					lvUsers.DataContext = _ds.Tables["user"].DefaultView;
+					LvUsers.DataContext = _ds.Tables["user"].DefaultView;
 				}
 				catch(XmlException ex)
 				{
@@ -57,7 +57,7 @@ namespace Amam
 
         private void DeleteUser(object sender, RoutedEventArgs e)
         {
-			var frmDelete = new FrmDeleteUser(_ds, lvUsers.SelectedValue.ToString());
+			var frmDelete = new FrmDeleteUser(_ds, LvUsers.SelectedValue.ToString());
 			frmDelete.ShowDialog();
 			_ds.WriteXml(_xmlPath);
         }
@@ -69,36 +69,36 @@ namespace Amam
 
         private void SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
-            if(lvUsers.SelectedItem != null)
+            if(LvUsers.SelectedItem != null)
             {
-                switch(lvUsers.Items.Count)
+                switch(LvUsers.Items.Count)
                 {
                     case 0:
-                        btnChange.IsEnabled = false;
-                        btnRemove.IsEnabled = false;
+                        BtnChange.IsEnabled = false;
+                        BtnRemove.IsEnabled = false;
                         break;
                     case 1:
-                        btnChange.IsEnabled = true;
-                        btnRemove.IsEnabled = false;
+                        BtnChange.IsEnabled = true;
+                        BtnRemove.IsEnabled = false;
                         break;
                     default:
-                        btnChange.IsEnabled = true;
-                        btnRemove.IsEnabled = true;
+                        BtnChange.IsEnabled = true;
+                        BtnRemove.IsEnabled = true;
                         break;
                 }
             }
             else
             {
-                btnChange.IsEnabled = false;
-                btnRemove.IsEnabled = false;
+                BtnChange.IsEnabled = false;
+                BtnRemove.IsEnabled = false;
             }
         }
 
 		private void ChangeUser(object sender, RoutedEventArgs e)
 		{
-			var frmChange = new FrmChangeUser(_ds, lvUsers.SelectedValue.ToString());
+			var frmChange = new FrmChangeUser(_ds, LvUsers.SelectedValue.ToString());
 			frmChange.ShowDialog();
-			lvUsers.SelectedIndex = 0;
+			LvUsers.SelectedIndex = 0;
 			_ds.WriteXml(_xmlPath);
 		}
 

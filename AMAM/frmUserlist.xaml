@@ -9,11 +9,11 @@
         Height="400">
     <DockPanel LastChildFill="True" Margin="0">
 		<DockPanel VerticalAlignment="Top" DockPanel.Dock="Bottom" >
-			<Button x:Name="btnAdd" Content="Benutzer hinzufügen" Margin="10" Padding="5" DockPanel.Dock="Left" Click="AddUser" TabIndex="1"/>
-			<Button x:Name="btnChange" Content="Benutzer bearbeiten" Margin="0,10,10,10" Padding="5" DockPanel.Dock="Left" TabIndex="2" IsEnabled="False" Click="ChangeUser"/>
-			<Button x:Name="btnRemove" Content="Benutzer löschen" Margin="0,10,10,10" Padding="5" DockPanel.Dock="Left" Click="DeleteUser" TabIndex="3" IsEnabled="False"/>
-            <Button x:Name="btnClose" Content="Schließen" Margin="0,10,10,10" Padding="5" DockPanel.Dock="Right" HorizontalAlignment="Right" TabIndex="4" Click="Close"/>
+			<Button x:Name="BtnAdd" Content="Benutzer hinzufügen" Margin="10" Padding="5" DockPanel.Dock="Left" Click="AddUser" TabIndex="1"/>
+			<Button x:Name="BtnChange" Content="Benutzer bearbeiten" Margin="0,10,10,10" Padding="5" DockPanel.Dock="Left" TabIndex="2" IsEnabled="False" Click="ChangeUser"/>
+			<Button x:Name="BtnRemove" Content="Benutzer löschen" Margin="0,10,10,10" Padding="5" DockPanel.Dock="Left" Click="DeleteUser" TabIndex="3" IsEnabled="False"/>
+            <Button x:Name="BtnClose" Content="Schließen" Margin="0,10,10,10" Padding="5" DockPanel.Dock="Right" HorizontalAlignment="Right" TabIndex="4" Click="Close"/>
 		</DockPanel>
-		<ListView x:Name="lvUsers" Margin="0" MinWidth="300" DockPanel.Dock="Top" DisplayMemberPath="username" SelectedValuePath="username" TabIndex="0" ItemsSource="{Binding}" SelectionChanged="SelectionChanged"/>
+		<ListView x:Name="LvUsers" Margin="0" MinWidth="300" DockPanel.Dock="Top" DisplayMemberPath="username" SelectedValuePath="username" TabIndex="0" ItemsSource="{Binding}" SelectionChanged="SelectionChanged"/>
 	</DockPanel>
 </Window>

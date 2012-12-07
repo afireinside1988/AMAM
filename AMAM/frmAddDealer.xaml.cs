@@ -60,38 +60,38 @@ namespace Amam
 
         private void AddDealer(object sender, RoutedEventArgs e)
         {
-            tbDealer.Background = Brushes.White;
-            tbDealer.Foreground = Brushes.Black;
-            tbMail.Background = Brushes.White;
-            tbMail.Foreground = Brushes.Black;
-            tbCustomerID.Background = Brushes.White;
-            tbCustomerID.Foreground = Brushes.Black;
+            TbDealer.Background = Brushes.White;
+            TbDealer.Foreground = Brushes.Black;
+            TbMail.Background = Brushes.White;
+            TbMail.Foreground = Brushes.Black;
+            TbCustomerId.Background = Brushes.White;
+            TbCustomerId.Foreground = Brushes.Black;
 
             var validator = new Validator();
 
-            if(tbDealer.Text.Length > 0 && validator.IsMailValid(tbMail.Text) && tbCustomerID.Text.Length > 0)
+            if(TbDealer.Text.Length > 0 && validator.IsMailValid(TbMail.Text) && TbCustomerId.Text.Length > 0)
             {
-                AddDealerToDataBase(tbDealer.Text, tbMail.Text, tbCustomerID.Text);
+                AddDealerToDataBase(TbDealer.Text, TbMail.Text, TbCustomerId.Text);
                 Close();
             }
             else
             {
-                if(tbDealer.Text.Length == 0)
+                if(TbDealer.Text.Length == 0)
                 {
-                    tbDealer.Background = Brushes.Red;
-                    tbDealer.Foreground = Brushes.Black;
+                    TbDealer.Background = Brushes.Red;
+                    TbDealer.Foreground = Brushes.Black;
                     MessageBox.Show("Sie müssen einen Vertriebspartner eingeben.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
-                if(!validator.IsMailValid(tbMail.Text))
+                if(!validator.IsMailValid(TbMail.Text))
                 {
-                    tbMail.Background = Brushes.Red;
-                    tbMail.Foreground = Brushes.Black;
+                    TbMail.Background = Brushes.Red;
+                    TbMail.Foreground = Brushes.Black;
                     MessageBox.Show("Die eingegebene eMail-Adresse ist nicht gültig.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
-                if(tbCustomerID.Text.Length == 0)
+                if(TbCustomerId.Text.Length == 0)
                 {
-                    tbCustomerID.Background = Brushes.Red;
-                    tbCustomerID.Foreground = Brushes.Black;
+                    TbCustomerId.Background = Brushes.Red;
+                    TbCustomerId.Foreground = Brushes.Black;
                     MessageBox.Show("Sie müssen eine Kundennummer eingeben.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }

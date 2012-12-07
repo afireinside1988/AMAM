@@ -35,7 +35,7 @@ namespace Amam
 					tblDatabases.PrimaryKey = new[] {tblDatabases.Columns["database_name"]};
 					if(tblDatabases.Rows.Contains("AMAM"))
 					{
-						btnAddDealer.IsEnabled = true;
+						BtnAddDealer.IsEnabled = true;
 					}
 					else
 					{
@@ -49,7 +49,7 @@ namespace Amam
 							tblDatabases.PrimaryKey = new[] { tblDatabases.Columns["database_name"] };
 							if(tblDatabases.Rows.Contains("AMAM"))
 							{
-								btnAddDealer.IsEnabled = true;
+								BtnAddDealer.IsEnabled = true;
 							}
 						}
 						catch(SqlException ex)
@@ -108,8 +108,8 @@ namespace Amam
 						dataAdapter.Fill(_dt);
 					}
 					_dt.PrimaryKey = new[] { _dt.Columns["pkVertriebID"] };
-					dgDealers.DataContext = _dt;
-                    dgDealers.SelectedValuePath = "VertriebID";
+					DgDealers.DataContext = _dt;
+                    DgDealers.SelectedValuePath = "VertriebID";
 				}
 				catch(SqlException ex)
 				{
@@ -141,7 +141,7 @@ namespace Amam
 
         private void RemoveDealer(object sender, RoutedEventArgs e)
         {
-            MessageBoxResult executeRemove = MessageBox.Show("Sind Sie sicher, dass der Vertrieb " + dgDealers.SelectedValue + " gelöscht werden soll?", "Vertrieb löschen", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            MessageBoxResult executeRemove = MessageBox.Show("Sind Sie sicher, dass der Vertrieb " + DgDealers.SelectedValue + " gelöscht werden soll?", "Vertrieb löschen", MessageBoxButton.YesNo, MessageBoxImage.Question);
             if(executeRemove == MessageBoxResult.Yes)
             {
                 var connStringBuilder = new SqlConnectionStringBuilder
@@ -158,7 +158,7 @@ namespace Amam
                         sqlConn.Open();
 
                         var removeDealerCommand = new SqlCommand("DELETE FROM Dealers WHERE VertriebID = @paramPK", sqlConn);
-                        removeDealerCommand.Parameters.Add(new SqlParameter("@paramPK", dgDealers.SelectedValue));
+                        removeDealerCommand.Parameters.Add(new SqlParameter("@paramPK", DgDealers.SelectedValue));
 
                         removeDealerCommand.ExecuteNonQuery();
                         RefreshDataBase();
@@ -182,21 +182,21 @@ namespace Amam
 
         private void DataGridSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if(dgDealers.Items.Count > 0)
+            if(DgDealers.Items.Count > 0)
             {
-                btnChangeDealer.IsEnabled = true;
-                btnDeleteDealer.IsEnabled = true;
+                BtnChangeDealer.IsEnabled = true;
+                BtnDeleteDealer.IsEnabled = true;
             }
             else
             {
-                btnDeleteDealer.IsEnabled = false;
-                btnChangeDealer.IsEnabled = false;
+                BtnDeleteDealer.IsEnabled = false;
+                BtnChangeDealer.IsEnabled = false;
             }
         }
 
         private void ChangeDealer(object sender, RoutedEventArgs e)
         {
-            var changeDealerForm = new FrmChangeDealer(dgDealers.SelectedValue.ToString());
+            var changeDealerForm = new FrmChangeDealer(DgDealers.SelectedValue.ToString());
             changeDealerForm.ShowDialog();
             RefreshDataBase();
         }

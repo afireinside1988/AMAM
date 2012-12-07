@@ -46,16 +46,16 @@ namespace Amam
         /// </summary>
         private void InitUserTable()
         {
-            cboUsername.Items.Clear();
+            CboUsername.Items.Clear();
 			
-            XmlReader xmlFile = XmlReader.Create(_xmlPath, new XmlReaderSettings());
+            var xmlFile = XmlReader.Create(_xmlPath, new XmlReaderSettings());
             try
             {
 
 				if(_ds.Tables.Count > 0)
 				{
-					cboUsername.ItemsSource = _ds.Tables["user"].DefaultView;
-					cboUsername.SelectedIndex = 0;
+					CboUsername.ItemsSource = _ds.Tables["user"].DefaultView;
+					CboUsername.SelectedIndex = 0;
 				}
 				else
 				{
@@ -63,8 +63,8 @@ namespace Amam
 					xmlFile.Close();
 					if(_ds.Tables.Count > 0)
 					{
-						cboUsername.ItemsSource = _ds.Tables["user"].DefaultView;
-						cboUsername.SelectedIndex = 0;
+						CboUsername.ItemsSource = _ds.Tables["user"].DefaultView;
+						CboUsername.SelectedIndex = 0;
 					}
 				}
             }
@@ -80,7 +80,7 @@ namespace Amam
                 var exReport = new ExceptionReporter(ex);
                 exReport.ReportExceptionToAdmin(_xmlPath + ".corrupt");
             }
-            if(!cboUsername.HasItems)
+            if(!CboUsername.HasItems)
             {
                 MessageBoxResult messageResult = MessageBox.Show("Die Benutzerdatenbank enthält keinen Benutzer." + Environment.NewLine + "Sie müssen nun einen Benutzer anlegen um fortfahren zu können.", "Fehler", MessageBoxButton.OKCancel, MessageBoxImage.Error);
                 if(messageResult == MessageBoxResult.OK)
@@ -88,8 +88,8 @@ namespace Amam
                     var addUser = new FrmAddUser(_ds);
                     addUser.ShowDialog();
                     _ds.WriteXml(_xmlPath);
-					cboUsername.ItemsSource = _ds.Tables["user"].DefaultView;
-					cboUsername.SelectedIndex = 0;
+					CboUsername.ItemsSource = _ds.Tables["user"].DefaultView;
+					CboUsername.SelectedIndex = 0;
                 }
                 else
                 {
@@ -105,10 +105,10 @@ namespace Amam
 
         private void LogIn(object sender, RoutedEventArgs e)
         {
-            tbPassword.Background = Brushes.White;
-            tbPassword.Foreground = Brushes.Black;
+            TbPassword.Background = Brushes.White;
+            TbPassword.Foreground = Brushes.Black;
 
-            if(Encryption.CreateHash(tbPassword.Password) == cboUsername.SelectedValue.ToString())
+            if(Encryption.CreateHash(TbPassword.Password) == CboUsername.SelectedValue.ToString())
             {
 				var mainForm = new FrmMain();
 				mainForm.Show();
@@ -116,8 +116,8 @@ namespace Amam
             }
             else
             {
-                tbPassword.Background = Brushes.Red;
-                tbPassword.Foreground = Brushes.White;
+                TbPassword.Background = Brushes.Red;
+                TbPassword.Foreground = Brushes.White;
                 MessageBox.Show("Das Passwort ist falsch.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -129,13 +129,13 @@ namespace Amam
         /// <param name="e"></param>
         private void PasswordInputChanged(object sender, RoutedEventArgs e)
         {
-            if(tbPassword.Password.Length > 0 && cboUsername.SelectedIndex > -1)
+            if(TbPassword.Password.Length > 0 && CboUsername.SelectedIndex > -1)
             {
-                btnLogIn.IsEnabled = true;
+                BtnLogIn.IsEnabled = true;
             }
             else
             {
-                btnLogIn.IsEnabled = false;
+                BtnLogIn.IsEnabled = false;
             }
         }
     }

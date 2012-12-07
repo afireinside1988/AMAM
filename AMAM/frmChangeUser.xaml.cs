@@ -19,7 +19,7 @@ namespace Amam
 			try
 			{
 				_usr.SelectUser(user);
-				tbNewUsername.Text = user;
+				TbNewUsername.Text = user;
 			}
 			catch(ArgumentOutOfRangeException ex)
 			{
@@ -29,15 +29,15 @@ namespace Amam
 
 		private void OldPasswordChanged(object sender, RoutedEventArgs e)
 		{
-			if(Encryption.CreateHash(tbOldPassword.Password) == _usr.PasswordHash)
+			if(Encryption.CreateHash(TbOldPassword.Password) == _usr.PasswordHash)
 			{
-				gbChangeUser.IsEnabled = true;
-				btnChange.IsEnabled = true;
+				GbChangeUser.IsEnabled = true;
+				BtnChange.IsEnabled = true;
 			}
 			else
 			{
-				gbChangeUser.IsEnabled = false;
-				btnChange.IsEnabled = false;
+				GbChangeUser.IsEnabled = false;
+				BtnChange.IsEnabled = false;
 			}
 		}
 
@@ -48,47 +48,47 @@ namespace Amam
 
 		private void ChangeUser(object sender, RoutedEventArgs e)
 		{
-			tbNewUsername.Background = Brushes.White;
-			tbNewUsername.Foreground = Brushes.Black;
-			tbNewPassword.Background = Brushes.White;
-			tbNewPassword.Foreground = Brushes.Black;
+			TbNewUsername.Background = Brushes.White;
+			TbNewUsername.Foreground = Brushes.Black;
+			TbNewPassword.Background = Brushes.White;
+			TbNewPassword.Foreground = Brushes.Black;
 
 				try
 				{
-					_usr.ChangeUserName(tbNewUsername.Text);
+					_usr.ChangeUserName(TbNewUsername.Text);
 				}
 				catch(UserNameIsNullOrEmptyException ex)
 				{
 					MessageBox.Show(ex.Message, "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
-					tbNewUsername.Background = Brushes.Red;
-					tbNewUsername.Foreground = Brushes.White;
-					tbNewUsername.Focus();
+					TbNewUsername.Background = Brushes.Red;
+					TbNewUsername.Foreground = Brushes.White;
+					TbNewUsername.Focus();
 					return;
 				}
 				catch(ArgumentException ex)
 				{
 					MessageBox.Show(ex.Message, "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
-					tbNewUsername.Background = Brushes.Red;
-					tbNewUsername.Foreground = Brushes.White;
-					tbNewUsername.Focus();
+					TbNewUsername.Background = Brushes.Red;
+					TbNewUsername.Foreground = Brushes.White;
+					TbNewUsername.Focus();
 					return;
 				}
 
-				if(tbNewPassword.Password.Length > 0)
+				if(TbNewPassword.Password.Length > 0)
 				{
-					if(tbNewPassword.Password == tbNewPasswordConfirm.Password)
+					if(TbNewPassword.Password == TbNewPasswordConfirm.Password)
 					{
 						try
 						{
-							_usr.SelectUser(tbNewUsername.Text);
-							_usr.ChangePassword(tbNewPassword.Password);
+							_usr.SelectUser(TbNewUsername.Text);
+							_usr.ChangePassword(TbNewPassword.Password);
 						}
 						catch(PasswordIsNullOrEmptyException ex)
 						{
 							MessageBox.Show(ex.Message, "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
-							tbNewPassword.Background = Brushes.Red;
-							tbNewPassword.Foreground = Brushes.White;
-							tbNewPassword.Focus();
+							TbNewPassword.Background = Brushes.Red;
+							TbNewPassword.Foreground = Brushes.White;
+							TbNewPassword.Focus();
 							return;
 						}
 						catch(ArgumentOutOfRangeException ex)
@@ -99,9 +99,9 @@ namespace Amam
 					else
 					{
 						MessageBox.Show("Das Passwort stimmt nicht mit der Passwortbestätigung überein.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
-						tbNewPassword.Password = null;
-						tbNewPasswordConfirm.Password = null;
-						tbNewPassword.Focus();
+						TbNewPassword.Password = null;
+						TbNewPasswordConfirm.Password = null;
+						TbNewPassword.Focus();
 						return;
 					}
 				}

@@ -20,7 +20,7 @@ namespace Amam
 
 		private void PasswordChanged(object sender, RoutedEventArgs e)
 		{
-		    btnDelete.IsEnabled = tbPassword.Password.Length > 0;
+		    BtnDelete.IsEnabled = TbPassword.Password.Length > 0;
 		}
 
 	    private void Close(object sender, RoutedEventArgs e)

@@ -10,14 +10,14 @@
         </DockPanel>
         <StackPanel Orientation="Horizontal">
             <StackPanel>
-                <Label Content="Vertriebspartner:" Padding="0" Margin="5" Height="{Binding ActualHeight, ElementName=tbDealer, Mode=OneWay}"/>
-                <Label Content="eMail-Adresse:" Padding="0" Margin="5" Height="{Binding ActualHeight, ElementName=tbMail, Mode=OneWay}"/>
-                <Label Content="Kundennummer:" Padding="0" Grid.IsSharedSizeScope="True" Margin="5" Height="{Binding ActualHeight, ElementName=tbCustomerID, Mode=OneWay}"/>
+                <Label Content="Vertriebspartner:" Padding="0" Margin="5" Height="{Binding ActualHeight, ElementName=TbDealer, Mode=OneWay}"/>
+                <Label Content="eMail-Adresse:" Padding="0" Margin="5" Height="{Binding ActualHeight, ElementName=TbMail, Mode=OneWay}"/>
+                <Label Content="Kundennummer:" Padding="0" Grid.IsSharedSizeScope="True" Margin="5" Height="{Binding ActualHeight, ElementName=TbCustomerId, Mode=OneWay}"/>
             </StackPanel>
             <StackPanel MinWidth="300">
-                <TextBox x:Name="tbDealer" Margin="5" MaxLength="255"></TextBox>
-                <TextBox x:Name="tbMail" Margin="5" MaxLength="255"></TextBox>
-                <TextBox x:Name="tbCustomerID" Margin="5" MaxLength="255"></TextBox>
+                <TextBox x:Name="TbDealer" Margin="5" MaxLength="255"></TextBox>
+                <TextBox x:Name="TbMail" Margin="5" MaxLength="255"></TextBox>
+                <TextBox x:Name="TbCustomerId" Margin="5" MaxLength="255"></TextBox>
             </StackPanel>
         </StackPanel>
     </DockPanel>

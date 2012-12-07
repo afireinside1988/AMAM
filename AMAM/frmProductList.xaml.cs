@@ -75,8 +75,8 @@ namespace Amam
                     _productsTable.Clear();
 					dataAdapter.Fill(_productsTable);
 
-					dgProducts.ItemsSource = _productsTable.DefaultView;
-					dgProducts.SelectedValuePath = "Produktnummer";
+					DgProducts.ItemsSource = _productsTable.DefaultView;
+					DgProducts.SelectedValuePath = "Produktnummer";
 
 				}
 				catch(SqlException ex)
@@ -109,7 +109,7 @@ namespace Amam
 
 		private void ChangeFilter(object sender, TextChangedEventArgs e)
 		{
-			_productsTable.DefaultView.RowFilter = "Produktname LIKE '*" + tbFilter.Text + "*'";
+			_productsTable.DefaultView.RowFilter = "Produktname LIKE '*" + TbFilter.Text + "*'";
 		}
 
 		private void SelectedProductChanged(object sender, SelectionChangedEventArgs e)
@@ -137,9 +137,9 @@ namespace Amam
 
 					var dataAdapter = new SqlDataAdapter {SelectCommand = new SqlCommand(command, sqlConn)};
 
-				    if(dgProducts.SelectedItem != null)
+				    if(DgProducts.SelectedItem != null)
                     {
-                        var currentRowView = (DataRowView)dgProducts.SelectedItem;
+                        var currentRowView = (DataRowView)DgProducts.SelectedItem;
                         DataRow row = currentRowView.Row;
 
                         dataAdapter.SelectCommand.Parameters.Add(new SqlParameter("@paramProduktnummer", row["Produktnummer"].ToString()));
@@ -147,9 +147,9 @@ namespace Amam
                         var productDataTable = new DataTable();
                         dataAdapter.Fill(productDataTable);
 
-                        dgProductData.DataContext = productDataTable.DefaultView;
+                        DgProductData.DataContext = productDataTable.DefaultView;
                     }
-                    else dgProductData.DataContext = null;
+                    else DgProductData.DataContext = null;
                     
 				}
 				catch(SqlException ex)
@@ -170,7 +170,7 @@ namespace Amam
 
         private void RemovePoduct(object sender, RoutedEventArgs e)
         {
-            var currentRow = (DataRowView)dgProducts.SelectedItem;
+            var currentRow = (DataRowView)DgProducts.SelectedItem;
             DataRow selectedRow = currentRow.Row;
             MessageBoxResult removeQuestion = MessageBox.Show("Sind Sie sicher, dass das Produkt " + selectedRow["Produktname"] + " gelöscht werden soll?", "Produkt löschen", MessageBoxButton.YesNo, MessageBoxImage.Question);
             if (removeQuestion != MessageBoxResult.Yes) return;
@@ -188,7 +188,14 @@ namespace Amam
                 {
                     sqlConn.Open();
 
-                    //todo hier Lösch-Kommando ausführen
+                    const string killFromProductNamesString = 
+                        "DELETE FROM ProductNames WHERE Produktnummer = @paramProduktNummer";
+                    var killFromProductNamesCommand = new SqlCommand(killFromProductNamesString, sqlConn);
+                    killFromProductNamesCommand.Parameters.Add(new SqlParameter("@paramProduktNummer", 
+                                                                                selectedRow["ProduktNummer"]));
+                    killFromProductNamesCommand.ExecuteNonQuery();
+
+                    RefreshProductList();
                 }
                 catch (SqlException ex)
                 {

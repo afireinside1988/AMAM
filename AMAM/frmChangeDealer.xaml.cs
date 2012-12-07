@@ -36,9 +36,9 @@ namespace Amam
                     {
                         while(dr.Read())
                         {
-                            tbDealer.Text = dr["Vertrieb"].ToString();
-                            tbMail.Text = dr["eMail"].ToString();
-                            tbCustomerID.Text = dr["Kundennummer"].ToString();
+                            TbDealer.Text = dr["Vertrieb"].ToString();
+                            TbMail.Text = dr["eMail"].ToString();
+                            TbCustomerId.Text = dr["Kundennummer"].ToString();
                         }
                     }
                 }
@@ -68,14 +68,14 @@ namespace Amam
         {
             var validator = new Validator();
 
-            tbDealer.Background = Brushes.White;
-            tbDealer.Foreground = Brushes.Black;
-            tbMail.Background = Brushes.White;
-            tbMail.Foreground = Brushes.Black;
-            tbCustomerID.Background = Brushes.White;
-            tbCustomerID.Foreground = Brushes.Black;
+            TbDealer.Background = Brushes.White;
+            TbDealer.Foreground = Brushes.Black;
+            TbMail.Background = Brushes.White;
+            TbMail.Foreground = Brushes.Black;
+            TbCustomerId.Background = Brushes.White;
+            TbCustomerId.Foreground = Brushes.Black;
 
-            if(tbDealer.Text.Length > 0 && validator.IsMailValid(tbMail.Text) && tbCustomerID.Text.Length > 0)
+            if(TbDealer.Text.Length > 0 && validator.IsMailValid(TbMail.Text) && TbCustomerId.Text.Length > 0)
             {
                 var connString = new SqlConnectionStringBuilder
                     {
@@ -95,9 +95,9 @@ namespace Amam
                                                            "Kundennummer = @paramCustomerID " +
                                                            "WHERE VertriebID = @paramPK", sqlConn);
                         
-                        changeCommand.Parameters.Add(new SqlParameter("@paramVertrieb", tbDealer.Text));
-                        changeCommand.Parameters.Add(new SqlParameter("@paramMail", tbMail.Text));
-                        changeCommand.Parameters.Add(new SqlParameter("@paramCustomerID", tbCustomerID.Text));
+                        changeCommand.Parameters.Add(new SqlParameter("@paramVertrieb", TbDealer.Text));
+                        changeCommand.Parameters.Add(new SqlParameter("@paramMail", TbMail.Text));
+                        changeCommand.Parameters.Add(new SqlParameter("@paramCustomerID", TbCustomerId.Text));
                         changeCommand.Parameters.Add(new SqlParameter("@paramPK", _id));
 
                         changeCommand.ExecuteNonQuery();
@@ -119,22 +119,22 @@ namespace Amam
                     }
                 }
             }
-            if(tbDealer.Text.Length == 0)
+            if(TbDealer.Text.Length == 0)
             {
-                tbDealer.Background = Brushes.Red;
-                tbDealer.Foreground = Brushes.Black;
+                TbDealer.Background = Brushes.Red;
+                TbDealer.Foreground = Brushes.Black;
                 MessageBox.Show("Sie müssen einen Vertriebspartner eingeben.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-            if(!validator.IsMailValid(tbMail.Text))
+            if(!validator.IsMailValid(TbMail.Text))
             {
-                tbMail.Background = Brushes.Red;
-                tbMail.Foreground = Brushes.Black;
+                TbMail.Background = Brushes.Red;
+                TbMail.Foreground = Brushes.Black;
                 MessageBox.Show("Die eingegebene eMail-Adresse ist nicht gültig.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-            if(tbCustomerID.Text.Length == 0)
+            if(TbCustomerId.Text.Length == 0)
             {
-                tbCustomerID.Background = Brushes.Red;
-                tbCustomerID.Foreground = Brushes.Black;
+                TbCustomerId.Background = Brushes.Red;
+                TbCustomerId.Foreground = Brushes.Black;
                 MessageBox.Show("Sie müssen eine Kundennummer eingeben.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }

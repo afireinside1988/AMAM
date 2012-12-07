@@ -4,7 +4,7 @@ using System.Data;
 
 namespace Amam
 {
-	class Sqlhelper
+	internal class Sqlhelper
 	{
 		public static bool TableExists(SqlConnection connection, string tableName)
 		{
@@ -14,6 +14,5 @@ namespace Amam
 			DataTable dt = connection.GetSchema("Tables", filter);
 			return dt.Rows.Count == 1;
 		}
-
 	}
 }
